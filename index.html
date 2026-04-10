@@ -174,7 +174,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 <!-- WELCOME -->
 <div class="welcome">
   <h2>BOS Paper Co.  -  Restaurant Supply</h2>
-  <p>Browse &amp; order below ÃÂÃÂ· Orders confirmed by BOS directly</p>
+  <p>Browse &amp; order below · Orders confirmed by BOS directly</p>
 </div>
 
 <!-- FILTERS -->
@@ -566,7 +566,7 @@ function renderCart() {
     return `<div class="cart-item">
       <div>
         <div class="cart-item-name">${p.name}</div>
-        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' ÃÂÃÂ· $'+lineTotal.toFixed(2) : ''}</div>
+        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' · $'+lineTotal.toFixed(2) : ''}</div>
       </div>
       <button class="cart-remove" onclick="removeFromCart(${id})">X</button>
     </div>`;
