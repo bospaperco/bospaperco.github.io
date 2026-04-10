@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>BOS Paper Co. â Order Portal</title>
+<title>BOS Paper Co.  -  Order Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap"/>
 <style>
@@ -15,7 +15,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--cream);color:#2a2d36;min-height:100vh;}
 a{color:inherit;text-decoration:none;}
-/* ââ HEADER ââ */
+/* -- HEADER -- */
 header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5rem;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(27,58,107,.10);}
 .header-inner{display:flex;align-items:center;justify-content:space-between;height:62px;max-width:1200px;margin:0 auto;}
 .logo-wrap{display:flex;align-items:center;gap:1rem;}
@@ -23,18 +23,18 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 .mgr-btn{font-family:'Oswald',sans-serif;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;background:none;border:1.5px solid var(--navy);color:var(--navy);padding:.3rem .8rem;border-radius:5px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.35rem;}
 .mgr-btn:hover{background:var(--navy);color:#fff;}
 .mgr-btn.active{background:var(--navy);color:#fff;}
-/* ââ WELCOME BAR ââ */
+/* -- WELCOME BAR -- */
 .welcome{background:linear-gradient(135deg,var(--navy-dk),var(--navy));color:#fff;padding:.8rem 1.5rem;text-align:center;}
 .welcome h2{font-family:'Oswald',sans-serif;font-size:1.05rem;letter-spacing:.06em;}
 .welcome p{font-size:.8rem;opacity:.85;margin-top:.2rem;}
-/* ââ FILTERS ââ */
+/* -- FILTERS -- */
 .filters{padding:.8rem 1.5rem;display:flex;gap:.5rem;flex-wrap:wrap;max-width:1200px;margin:0 auto;}
 .filter-btn{font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:.35rem .9rem;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--gray);cursor:pointer;transition:all .15s;}
 .filter-btn.active,.filter-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
-/* ââ MAIN LAYOUT ââ */
+/* -- MAIN LAYOUT -- */
 .main{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;padding:0 1.5rem 2rem;max-width:1200px;margin:0 auto;}
 @media(max-width:820px){.main{grid-template-columns:1fr;}}
-/* ââ PRODUCT GRID ââ */
+/* -- PRODUCT GRID -- */
 .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:1rem;align-content:start;}
 .prod-card{background:var(--white);border:1.5px solid var(--border);border-radius:8px;overflow:hidden;transition:box-shadow .2s;display:flex;flex-direction:column;}
 .prod-card:hover{box-shadow:0 4px 18px rgba(27,58,107,.12);}
@@ -60,7 +60,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 .add-btn{margin-left:auto;font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:.4rem .9rem;background:var(--navy);color:#fff;border:none;border-radius:5px;cursor:pointer;transition:background .15s;white-space:nowrap;}
 .add-btn:hover{background:var(--navy-lt);}
 .add-btn.added{background:var(--green);}
-/* ââ ORDER PANEL ââ */
+/* -- ORDER PANEL -- */
 .order-panel{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:1.2rem;position:sticky;top:80px;height:fit-content;}
 .order-title{font-family:'Oswald',sans-serif;font-size:1.1rem;color:var(--navy);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
 .cart-count{background:var(--navy);color:#fff;border-radius:50%;width:20px;height:20px;font-size:.7rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
@@ -98,7 +98,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 .float-cart .fc-badge{background:#ef4444;color:#fff;border-radius:50%;width:1.3rem;height:1.3rem;font-size:.75rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 @media(max-width:768px){.float-cart{display:flex;}}
 
-/* ââ MANAGER MODAL ââ */
+/* -- MANAGER MODAL -- */
 .mgr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;padding:1rem;}
 .mgr-overlay.open{display:flex;}
 .mgr-modal{background:var(--white);border-radius:12px;width:100%;max-width:620px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);}
@@ -147,8 +147,8 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 
 <!-- WELCOME -->
 <div class="welcome">
-  <h2>BOS Paper Co. â Restaurant Supply</h2>
-  <p>Browse &amp; order below Â· Orders confirmed by BOS directly</p>
+  <h2>BOS Paper Co.  -  Restaurant Supply</h2>
+  <p>Browse &amp; order below · Orders confirmed by BOS directly</p>
 </div>
 
 <!-- FILTERS -->
@@ -161,7 +161,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
     <div class="order-title">
       Your Order <span class="cart-count" id="cartCount">0</span>
     </div>
-    <div id="cartItems"><div class="cart-empty">No items yet â add from the left.</div></div>
+    <div id="cartItems"><div class="cart-empty">No items yet  -  add from the left.</div></div>
     <div class="cart-total" id="cartTotal" style="display:none">
       <span>Subtotal</span><span id="totalAmt">$0</span>
     </div>
@@ -169,11 +169,11 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
     <div class="del-opts" id="delOpts">
       <label class="del-opt selected" id="opt-std">
         <input type="radio" name="del" value="std" checked/>
-        <div><div class="del-opt-title">Standard â 3 Business Days</div><div class="del-opt-sub">Free delivery</div></div>
+        <div><div class="del-opt-title">Standard  -  3 Business Days</div><div class="del-opt-sub">Free delivery</div></div>
       </label>
       <label class="del-opt" id="opt-emer">
         <input type="radio" name="del" value="emer"/>
-        <div><div class="del-opt-title">Emergency â Next Business Day</div><div class="del-opt-sub">+$10 rush fee</div></div>
+        <div><div class="del-opt-title">Emergency  -  Next Business Day</div><div class="del-opt-sub">+$10 rush fee</div></div>
       </label>
     </div>
     <div class="section-label">Your Info</div>
@@ -346,7 +346,7 @@ const IMG = {
   20:'data:image/jpeg;base64,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',
 };
 
-// ââ State ââ
+// -- State --
 // --- LIVE STOCK STATUS ---
 var STOCK_API_URL = "https://script.google.com/macros/s/AKfycbwKrrzepBq5XTxuEJCcHKkYCACWlWxBt2ftkYM3yxPTTXyTAEAyPIFN5MmuAszNgMqV3A/exec";
 
@@ -376,7 +376,7 @@ let cart = {};
 let overrides = {};  // id -> {oos, price}
 let activeFilter = 'All';
 
-// ââ Helpers ââ
+// -- Helpers --
 function bizDaysAdd(date, days) {
   let d = new Date(date);
   let added = 0;
@@ -400,7 +400,7 @@ function getProduct(id) {
   return {...p, oos: ov.oos !== undefined ? ov.oos : p.oos, price: ov.price !== undefined ? ov.price : p.price};
 }
 
-// ââ Filters ââ
+// -- Filters --
 function buildFilters() {
   const bar = document.getElementById('filterBar');
   const cats = ['All', ...new Set(PRODUCTS.map(p => p.cat))];
@@ -414,7 +414,7 @@ function setFilter(cat) {
   renderGrid();
 }
 
-// ââ Grid ââ
+// -- Grid --
 function renderGrid() {
   const grid = document.getElementById('prodGrid');
   const list = activeFilter === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeFilter);
@@ -441,17 +441,17 @@ function renderGrid() {
         <div class="prod-detail">${p.detail}</div>
         ${priceDisplay}
         <div class="qty-row">
-          <button class="qty-btn" onclick="changeQty(${p.id},-1)">â</button>
+          <button class="qty-btn" onclick="changeQty(${p.id},-1)">-</button>
           <span class="qty-val" id="qty-${p.id}">${qty}</span>
           <button class="qty-btn" onclick="changeQty(${p.id},1)">+</button>
-          <button class="add-btn${qty > 0 ? ' added' : ''}" id="addbtn-${p.id}" onclick="addToCart(${p.id})">${qty > 0 ? 'â Added' : 'Add'}</button>
+          <button class="add-btn${qty > 0 ? ' added' : ''}" id="addbtn-${p.id}" onclick="addToCart(${p.id})">${qty > 0 ? '+ Added' : 'Add'}</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ââ Qty / Cart ââ
+// -- Qty / Cart --
 function changeQty(id, delta) {
   const p = getProduct(id);
   const max = p.max_order || 10;
@@ -483,7 +483,7 @@ function renderCart() {
   const fcBadge = document.getElementById('fcBadge');
   if (fcBadge) fcBadge.textContent = items.length;
   if (!items.length) {
-    el.innerHTML = '<div class="cart-empty">No items yet â add from the left.</div>';
+    el.innerHTML = '<div class="cart-empty">No items yet  -  add from the left.</div>';
     totalEl.style.display = 'none';
     return;
   }
@@ -496,15 +496,15 @@ function renderCart() {
     return `<div class="cart-item">
       <div>
         <div class="cart-item-name">${p.name}</div>
-        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' Â· $'+lineTotal.toFixed(2) : ''}</div>
+        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' · $'+lineTotal.toFixed(2) : ''}</div>
       </div>
-      <button class="cart-remove" onclick="removeFromCart(${id})">â</button>
+      <button class="cart-remove" onclick="removeFromCart(${id})">X</button>
     </div>`;
   }).join('') + '</div>';
   totalEl.style.display = 'flex';
   document.getElementById('totalAmt').textContent = total > 0
     ? '$' + total.toFixed(2) + (hasUnknownPrice ? '+' : '')
-    : 'â';
+    : ' - ';
 }
 function updateOrderBtn() {
   const hasItems = Object.values(cart).some(v => v > 0);
@@ -512,7 +512,7 @@ function updateOrderBtn() {
   renderCart();
 }
 
-// ââ Delivery options ââ
+// -- Delivery options --
 document.querySelectorAll('input[name="del"]').forEach(r => {
   r.addEventListener('change', () => {
     document.querySelectorAll('.del-opt').forEach(o => o.classList.remove('selected'));
@@ -520,7 +520,7 @@ document.querySelectorAll('input[name="del"]').forEach(r => {
   });
 });
 
-// ââ Generate order ââ
+// -- Generate order --
 function generateOrder() {
   const name = document.getElementById('custName').value.trim() || '(no name)';
   const phone = document.getElementById('custPhone').value.trim() || '(no phone)';
@@ -534,15 +534,15 @@ function generateOrder() {
     const p = getProduct(Number(id));
     const line = p.price ? p.price * qty : null;
     if (line) total += line; else hasUnknown = true;
-    return `  â¢ ${p.name} x${qty} case${qty>1?'s':''}${line ? ' ($'+line.toFixed(2)+')' : ''}`;
+    return `  * ${p.name} x${qty} case${qty>1?'s':''}${line ? ' ($'+line.toFixed(2)+')' : ''}`;
   });
   const totalStr = total > 0 ? '\nSubtotal: $' + total.toFixed(2) + (hasUnknown ? '+' : '') : '';
-  const rush = delType === 'emer' ? '\nâ¡ EMERGENCY ORDER â +$10 rush fee' : '';
+  const rush = delType === 'emer' ? '\n! EMERGENCY ORDER  -  +$10 rush fee' : '';
   const notesLine = notes ? `\nNotes: ${notes}` : '';
-  const msg = `BOS Paper Co. Order\n${'-'.repeat(28)}\nFrom: ${name}\nPhone: ${phone}\nDelivery: ${delType==='emer'?'EMERGENCY':'Standard'} â ${delDate}${rush}\n\nItems:\n${lines.join('\n')}${totalStr}${notesLine}\n${'-'.repeat(28)}`;
+  const msg = `BOS Paper Co. Order\n${'-'.repeat(28)}\nFrom: ${name}\nPhone: ${phone}\nDelivery: ${delType==='emer'?'EMERGENCY':'Standard'}  -  ${delDate}${rush}\n\nItems:\n${lines.join('\n')}${totalStr}${notesLine}\n${'-'.repeat(28)}`;
   document.getElementById('orderMsg').textContent = msg;
   document.getElementById('orderResult').style.display = 'block';
-  document.getElementById('genBtn').textContent = 'â Order Ready â Edit Above if Needed';
+  document.getElementById('genBtn').textContent = '+ Order Ready  -  Edit Above if Needed';
 }
 function sendSMS() {
   const msg = document.getElementById('orderMsg').textContent;
@@ -563,7 +563,7 @@ function scrollToCart() {
   document.querySelector('.order-panel').scrollIntoView({behavior:'smooth'});
 }
 
-// ââ Manager Mode ââ
+// -- Manager Mode --
 function openMgr() {
   document.getElementById('mgrOverlay').classList.add('open');
   document.getElementById('mgrPw').value = '';
@@ -611,7 +611,7 @@ function buildMgrPanel() {
       </div>
       <div>
         <div style="font-size:.65rem;color:var(--gray);margin-bottom:.2rem;text-align:center;">Price/case</div>
-        <input class="mgr-price-input" type="number" id="mgr-price-${p.id}" value="${price}" placeholder="â" min="0" step="0.01"/>
+        <input class="mgr-price-input" type="number" id="mgr-price-${p.id}" value="${price}" placeholder=" - " min="0" step="0.01"/>
       </div>
       <div class="toggle-wrap">
         <label class="toggle">
@@ -646,7 +646,7 @@ function saveMgr() {
   renderCart();
 }
 
-// ââ Init ââ
+// -- Init --
 buildFilters();
 renderGrid();
 </script>
