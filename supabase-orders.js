@@ -9,7 +9,7 @@
 
   // Load Supabase client library dynamically
   var script = document.createElement('script');
-  script.src = "https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.39.3/umd/supabase.min.js";
+  script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
   script.onload = function() {
     _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     hookGenerateOrder();
