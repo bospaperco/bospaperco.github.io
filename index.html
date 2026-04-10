@@ -94,9 +94,8 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 .send-line{background:#06C755;}
 .send-copy{background:#6b7280;}
 /* -- FLOATING CART BUTTON (mobile) -- */
-.float-cart{display:none;position:fixed;bottom:1.2rem;right:1.2rem;z-index:400;background:var(--navy);color:#fff;border:none;border-radius:50px;padding:.75rem 1.2rem;font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:.05em;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);align-items:center;gap:.5rem;}
+.float-cart{display:flex;position:fixed;bottom:1.2rem;left:1.2rem;z-index:400;background:var(--navy);color:#fff;border:none;border-radius:50px;padding:.75rem 1.2rem;font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:.05em;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25);align-items:center;gap:.5rem;}
 .float-cart .fc-badge{background:#ef4444;color:#fff;border-radius:50%;width:1.3rem;height:1.3rem;font-size:.75rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
-@media(max-width:768px){.float-cart{display:flex;}}
 
 /* -- TOAST POPUP -- */
 .toast-container{position:fixed;top:80px;right:1rem;z-index:600;display:flex;flex-direction:column;gap:.5rem;pointer-events:none;}
@@ -106,7 +105,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 @keyframes toastOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(40px);}}
 
 /* -- SCROLL TO TOP -- */
-.scroll-top{display:none;position:fixed;bottom:1.2rem;left:1.2rem;z-index:400;background:var(--navy);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2);align-items:center;justify-content:center;transition:opacity .2s;}
+.scroll-top{display:none;position:fixed;bottom:1.2rem;right:1.2rem;z-index:400;background:var(--navy);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.2);align-items:center;justify-content:center;transition:opacity .2s;}
 .scroll-top.show{display:flex;}
 .scroll-top:hover{background:var(--navy-lt);}
 
@@ -175,7 +174,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 <!-- WELCOME -->
 <div class="welcome">
   <h2>BOS Paper Co.  -  Restaurant Supply</h2>
-  <p>Browse &amp; order below ÃÂ· Orders confirmed by BOS directly</p>
+  <p>Browse &amp; order below ÃÂÃÂ· Orders confirmed by BOS directly</p>
 </div>
 
 <!-- FILTERS -->
@@ -260,84 +259,84 @@ const ADMIN_PW = "1305";
 
 const PRODUCTS = [
   // === BOXES (Hinged Containers) ===
-  {id:1,  name:"FH-132 32oz Hinged Box",     detail:"Rect hinged container ÃÂ· 150/case",   cat:"Boxes", item_code:"FH-132-B", price:29, max_order:8},
-  {id:2,  name:"FH-128 28oz Hinged Box",     detail:"Rect hinged container ÃÂ· 150/case",   cat:"Boxes", item_code:"FH-128-B", price:28, max_order:8},
-  {id:21, name:"FH-128W 28oz Hinged Box (White)", detail:"White rect container ÃÂ· 150/case", cat:"Boxes", item_code:"FH-128-W", price:28, max_order:8},
-  {id:22, name:"FH-138 Hinged Container",    detail:"Black hinged container ÃÂ· 150/case",   cat:"Boxes", item_code:"FH-138", price:32, max_order:8},
-  {id:23, name:"FH-129 Hinged Container",    detail:"Hinged container ÃÂ· 150/case",         cat:"Boxes", item_code:"FH-129", price:24, max_order:8},
-  {id:24, name:"FH-78 Hinged Container",     detail:"Hinged container ÃÂ· 150/case",         cat:"Boxes", item_code:"FH-78", price:24, max_order:8},
-  {id:25, name:"FH-68 Hinged Container",     detail:"Hinged container ÃÂ· 150/case",         cat:"Boxes", item_code:"FH-68", price:23, max_order:8},
-  {id:26, name:"FH-28 Two-Side Hinged",      detail:"Two-side hinged container ÃÂ· 150/case",cat:"Boxes", item_code:"FH-28", price:31, max_order:8},
-  {id:27, name:"FH-23 Hinged Container",     detail:"Hinged container ÃÂ· 150/case",         cat:"Boxes", item_code:"FH-23", price:22, max_order:8},
-  {id:28, name:"FH-18 Hinged Container",     detail:"Hinged container ÃÂ· 150/case",         cat:"Boxes", item_code:"FH-18", price:21, max_order:8},
-  {id:29, name:"FH-63 Deli Container",       detail:"Deli container",                           cat:"Boxes", item_code:"FH-63", price:53, max_order:4},
-  {id:30, name:"FH-64 Deli Container",       detail:"Deli container",                           cat:"Boxes", item_code:"FH-64", price:58, max_order:4},
-  {id:31, name:"FH-65 Deli Container",       detail:"Large deli container",                     cat:"Boxes", item_code:"FH-65", price:69, max_order:4},
+  {id:1,  name:"FH-132 32oz Hinged Box",     detail:"150/case",   cat:"Boxes", item_code:"FH-132-B", price:29, max_order:8},
+  {id:2,  name:"FH-128 28oz Hinged Box",     detail:"150/case",   cat:"Boxes", item_code:"FH-128-B", price:28, max_order:8},
+  {id:21, name:"FH-128W 28oz Hinged Box (White)", detail:"150/case", cat:"Boxes", item_code:"FH-128-W", price:28, max_order:8},
+  {id:22, name:"FH-138 Hinged Container",    detail:"150/case",   cat:"Boxes", item_code:"FH-138", price:32, max_order:8},
+  {id:23, name:"FH-129 Hinged Container",    detail:"150/case",         cat:"Boxes", item_code:"FH-129", price:24, max_order:8},
+  {id:24, name:"FH-78 Hinged Container",     detail:"150/case",         cat:"Boxes", item_code:"FH-78", price:24, max_order:8},
+  {id:25, name:"FH-68 Hinged Container",     detail:"150/case",         cat:"Boxes", item_code:"FH-68", price:23, max_order:8},
+  {id:26, name:"FH-28 Two-Side Hinged",      detail:"150/case",cat:"Boxes", item_code:"FH-28", price:31, max_order:8},
+  {id:27, name:"FH-23 Hinged Container",     detail:"150/case",         cat:"Boxes", item_code:"FH-23", price:22, max_order:8},
+  {id:28, name:"FH-18 Hinged Container",     detail:"150/case",         cat:"Boxes", item_code:"FH-18", price:21, max_order:8},
+  {id:29, name:"FH-63 Deli Container",       detail:"",                           cat:"Boxes", item_code:"FH-63", price:53, max_order:4},
+  {id:30, name:"FH-64 Deli Container",       detail:"",                           cat:"Boxes", item_code:"FH-64", price:58, max_order:4},
+  {id:31, name:"FH-65 Deli Container",       detail:"",                     cat:"Boxes", item_code:"FH-65", price:69, max_order:4},
   {id:32, name:"FH-525 Container",           detail:"300/case",                                 cat:"Boxes", item_code:"FH-525", price:52, max_order:4},
   {id:33, name:"818 Container",              detail:"150/case",                                 cat:"Boxes", item_code:"818", price:26, max_order:8},
   // === SOUPS ===
-  {id:5,  name:"8oz Soup Cup with Lid",      detail:"Round soup container ÃÂ· 240/case",     cat:"Soups", item_code:"8oz Soup", price:26, max_order:8},
-  {id:34, name:"12oz Soup Cup with Lid",     detail:"Round soup container ÃÂ· 240/case",     cat:"Soups", item_code:"12oz Soup", price:26, max_order:8},
-  {id:35, name:"16oz Soup Cup with Lid",     detail:"Round soup container ÃÂ· 240/case",     cat:"Soups", item_code:"16oz Soup", price:26, max_order:8},
-  {id:36, name:"24oz Soup Cup with Lid",     detail:"Round soup container ÃÂ· 240/case",     cat:"Soups", item_code:"24oz Soup", price:38, max_order:8},
-  {id:37, name:"32oz Soup Cup with Lid",     detail:"Round soup container ÃÂ· 240/case",     cat:"Soups", item_code:"32oz Soup", price:39, max_order:4},
-  {id:38, name:"64oz Soup Cup with Lid",     detail:"Large soup container ÃÂ· 240/case",     cat:"Soups", item_code:"64oz Soup", price:50, max_order:4},
+  {id:5,  name:"8oz Soup Cup with Lid",      detail:"240/case",     cat:"Soups", item_code:"8oz Soup", price:26, max_order:8},
+  {id:34, name:"12oz Soup Cup with Lid",     detail:"240/case",     cat:"Soups", item_code:"12oz Soup", price:26, max_order:8},
+  {id:35, name:"16oz Soup Cup with Lid",     detail:"240/case",     cat:"Soups", item_code:"16oz Soup", price:26, max_order:8},
+  {id:36, name:"24oz Soup Cup with Lid",     detail:"240/case",     cat:"Soups", item_code:"24oz Soup", price:38, max_order:8},
+  {id:37, name:"32oz Soup Cup with Lid",     detail:"240/case",     cat:"Soups", item_code:"32oz Soup", price:39, max_order:4},
+  {id:38, name:"64oz Soup Cup with Lid",     detail:"240/case",     cat:"Soups", item_code:"64oz Soup", price:50, max_order:4},
   // === BOWLS & NOODLE ===
-  {id:4,  name:"FH-36 36oz Noodle Bowl",     detail:"White hinged noodle bowl ÃÂ· 150/case", cat:"Bowls", item_code:"FH-36-W", price:30, max_order:8},
-  {id:6,  name:"JN-50B 50oz Noodle Box",     detail:"Tall noodle/soup container ÃÂ· 150/case",cat:"Bowls", item_code:"JN-50B", price:55, max_order:4},
-  {id:39, name:"32oz Round Bowl (32bow)",     detail:"Round bowl ÃÂ· 150/case",               cat:"Bowls", item_code:"32bow", price:30, max_order:8},
-  {id:40, name:"24oz Round Bowl (24bow)",     detail:"Round bowl ÃÂ· 150/case",               cat:"Bowls", item_code:"24bow", price:30, max_order:8},
-  {id:41, name:"42oz Round Bowl",            detail:"Large round bowl ÃÂ· 600/case",          cat:"Bowls", item_code:"42oz Round", price:110, max_order:2},
-  {id:42, name:"36oz Round Bowl",            detail:"Round bowl ÃÂ· 600/case",                cat:"Bowls", item_code:"36oz Round", price:100, max_order:2},
-  {id:43, name:"24oz Round Bowl",            detail:"Round bowl ÃÂ· 600/case",                cat:"Bowls", item_code:"24oz Round", price:90, max_order:2},
+  {id:4,  name:"FH-36 36oz Noodle Bowl",     detail:"150/case", cat:"Bowls", item_code:"FH-36-W", price:30, max_order:8},
+  {id:6,  name:"JN-50B 50oz Noodle Box",     detail:"150/case",cat:"Bowls", item_code:"JN-50B", price:55, max_order:4},
+  {id:39, name:"32oz Round Bowl (32bow)",     detail:"150/case",               cat:"Bowls", item_code:"32bow", price:30, max_order:8},
+  {id:40, name:"24oz Round Bowl (24bow)",     detail:"150/case",               cat:"Bowls", item_code:"24bow", price:30, max_order:8},
+  {id:41, name:"42oz Round Bowl",            detail:"600/case",          cat:"Bowls", item_code:"42oz Round", price:110, max_order:2},
+  {id:42, name:"36oz Round Bowl",            detail:"600/case",                cat:"Bowls", item_code:"36oz Round", price:100, max_order:2},
+  {id:43, name:"24oz Round Bowl",            detail:"600/case",                cat:"Bowls", item_code:"24oz Round", price:90, max_order:2},
   // === RICE BOXES ===
-  {id:7,  name:"8oz Paper Rice Box",         detail:"Wire handle ÃÂ· 1000/case",             cat:"Rice", item_code:"8oz Rice", price:58, max_order:8},
-  {id:8,  name:"16oz Paper Rice Box",        detail:"Wire handle ÃÂ· 500/case",              cat:"Rice", item_code:"16oz Rice", price:31, max_order:8},
-  {id:9,  name:"32oz Paper Rice Box",        detail:"Wire handle ÃÂ· 500/case",              cat:"Rice", item_code:"32oz Rice", price:56, max_order:8},
+  {id:7,  name:"8oz Paper Rice Box",         detail:"1000/case",             cat:"Rice", item_code:"8oz Rice", price:58, max_order:8},
+  {id:8,  name:"16oz Paper Rice Box",        detail:"500/case",              cat:"Rice", item_code:"16oz Rice", price:31, max_order:8},
+  {id:9,  name:"32oz Paper Rice Box",        detail:"500/case",              cat:"Rice", item_code:"32oz Rice", price:56, max_order:8},
   // === FOIL PANS ===
-  {id:10, name:"SL-705 1lb Foil Pan",        detail:"Heavy duty foil pan ÃÂ· 1000/case",     cat:"Foil", item_code:"SL-705", price:90, max_order:4},
-  {id:11, name:"SL-768 1.5lb Foil Pan",      detail:"Heavy duty foil pan ÃÂ· 500/case",      cat:"Foil", item_code:"SL-768", price:85, max_order:4},
-  {id:12, name:"SL-788 2.25lb Foil Pan",     detail:"Heavy duty foil pan ÃÂ· 500/case",      cat:"Foil", item_code:"SL-788", price:90, max_order:4},
-  {id:44, name:"SL-747 Foil Pan",            detail:"Heavy duty foil pan ÃÂ· 500/case",      cat:"Foil", item_code:"SL-747", price:90, max_order:4},
-  {id:45, name:"529 Foil Pan",               detail:"Foil pan ÃÂ· 500/case",                 cat:"Foil", item_code:"529", price:90, max_order:4},
-  {id:46, name:"528 Foil Pan",               detail:"Foil pan ÃÂ· 500/case",                 cat:"Foil", item_code:"528", price:80, max_order:4},
-  {id:47, name:"527 Foil Pan",               detail:"Foil pan ÃÂ· 500/case",                 cat:"Foil", item_code:"527", price:58, max_order:4},
+  {id:10, name:"SL-705 1lb Foil Pan",        detail:"1000/case",     cat:"Foil", item_code:"SL-705", price:90, max_order:4},
+  {id:11, name:"SL-768 1.5lb Foil Pan",      detail:"500/case",      cat:"Foil", item_code:"SL-768", price:85, max_order:4},
+  {id:12, name:"SL-788 2.25lb Foil Pan",     detail:"500/case",      cat:"Foil", item_code:"SL-788", price:90, max_order:4},
+  {id:44, name:"SL-747 Foil Pan",            detail:"500/case",      cat:"Foil", item_code:"SL-747", price:90, max_order:4},
+  {id:45, name:"529 Foil Pan",               detail:"500/case",                 cat:"Foil", item_code:"529", price:90, max_order:4},
+  {id:46, name:"528 Foil Pan",               detail:"500/case",                 cat:"Foil", item_code:"528", price:80, max_order:4},
+  {id:47, name:"527 Foil Pan",               detail:"500/case",                 cat:"Foil", item_code:"527", price:58, max_order:4},
   // === BAGS ===
-  {id:13, name:"Small Paper Handle Bag",     detail:"Kraft carry-out bag ÃÂ· 250/case",      cat:"Bags", item_code:"Bag S", price:37, max_order:8},
-  {id:14, name:"Medium Paper Handle Bag",    detail:"Kraft carry-out bag ÃÂ· 250/case",      cat:"Bags", item_code:"Bag M", price:40, max_order:8},
-  {id:15, name:"Large Paper Handle Bag",     detail:"Kraft carry-out bag ÃÂ· 250/case",      cat:"Bags", item_code:"Bag L", price:51, max_order:8},
-  {id:16, name:"#1 Paper Box",               detail:"Small kraft box ÃÂ· 450/case",          cat:"Bags", item_code:"#1 Paper Box", price:48, max_order:8},
-  {id:48, name:"#2 Paper Box",               detail:"Kraft box ÃÂ· 300/case",                cat:"Bags", item_code:"#2 Paper Box", price:52, max_order:4},
-  {id:49, name:"#3 Paper Box",               detail:"Kraft box ÃÂ· 200/case",                cat:"Bags", item_code:"#3 Paper Box", price:47, max_order:4},
-  {id:50, name:"#4 Paper Box",               detail:"Kraft box ÃÂ· 160/case",                cat:"Bags", item_code:"#4 Paper Box", price:47, max_order:4},
-  {id:17, name:"1/8 Bag",                    detail:"Brown kraft bag ÃÂ· 500/case",          cat:"Bags", item_code:"1/8 bag", price:40, max_order:8},
-  {id:51, name:"4lb Paper Bag",              detail:"Kraft bag ÃÂ· 500/case",                cat:"Bags", item_code:"4lb Bag", price:21, max_order:8},
-  {id:52, name:"6lb Paper Bag",              detail:"Kraft bag ÃÂ· 500/case",                cat:"Bags", item_code:"6lb Bag", price:22, max_order:8},
-  {id:53, name:"8lb Paper Bag",              detail:"Kraft bag ÃÂ· 500/case",                cat:"Bags", item_code:"8lb Bag", price:24, max_order:8},
-  {id:54, name:"12lb Paper Bag",             detail:"Kraft bag ÃÂ· 500/case",                cat:"Bags", item_code:"12lb Bag", price:27, max_order:8},
-  {id:55, name:"16lb Paper Bag",             detail:"Kraft bag ÃÂ· 400/case",                cat:"Bags", item_code:"16lb Bag", price:31, max_order:8},
-  {id:18, name:"20lb Paper Bag",             detail:"Heavy-duty kraft bag ÃÂ· 400/case",     cat:"Bags", item_code:"20lb Bag", price:31, max_order:8},
-  {id:56, name:"25lb Paper Bag",             detail:"Heavy-duty kraft bag ÃÂ· 400/case",     cat:"Bags", item_code:"25lb Bag", price:31, max_order:8},
+  {id:13, name:"Small Paper Handle Bag",     detail:"250/case",      cat:"Bags", item_code:"Bag S", price:37, max_order:8},
+  {id:14, name:"Medium Paper Handle Bag",    detail:"250/case",      cat:"Bags", item_code:"Bag M", price:40, max_order:8},
+  {id:15, name:"Large Paper Handle Bag",     detail:"250/case",      cat:"Bags", item_code:"Bag L", price:51, max_order:8},
+  {id:16, name:"#1 Paper Box",               detail:"450/case",          cat:"Bags", item_code:"#1 Paper Box", price:48, max_order:8},
+  {id:48, name:"#2 Paper Box",               detail:"300/case",                cat:"Bags", item_code:"#2 Paper Box", price:52, max_order:4},
+  {id:49, name:"#3 Paper Box",               detail:"200/case",                cat:"Bags", item_code:"#3 Paper Box", price:47, max_order:4},
+  {id:50, name:"#4 Paper Box",               detail:"160/case",                cat:"Bags", item_code:"#4 Paper Box", price:47, max_order:4},
+  {id:17, name:"1/8 Bag",                    detail:"500/case",          cat:"Bags", item_code:"1/8 bag", price:40, max_order:8},
+  {id:51, name:"4lb Paper Bag",              detail:"500/case",                cat:"Bags", item_code:"4lb Bag", price:21, max_order:8},
+  {id:52, name:"6lb Paper Bag",              detail:"500/case",                cat:"Bags", item_code:"6lb Bag", price:22, max_order:8},
+  {id:53, name:"8lb Paper Bag",              detail:"500/case",                cat:"Bags", item_code:"8lb Bag", price:24, max_order:8},
+  {id:54, name:"12lb Paper Bag",             detail:"500/case",                cat:"Bags", item_code:"12lb Bag", price:27, max_order:8},
+  {id:55, name:"16lb Paper Bag",             detail:"400/case",                cat:"Bags", item_code:"16lb Bag", price:31, max_order:8},
+  {id:18, name:"20lb Paper Bag",             detail:"400/case",     cat:"Bags", item_code:"20lb Bag", price:31, max_order:8},
+  {id:56, name:"25lb Paper Bag",             detail:"400/case",     cat:"Bags", item_code:"25lb Bag", price:31, max_order:8},
   // === SAUCE CUPS ===
-  {id:57, name:"1oz Sauce Cup",              detail:"Condiment cup ÃÂ· 2500/case",           cat:"Sauce", item_code:"1oz Sauce", price:36, max_order:4},
-  {id:58, name:"1.5oz Sauce Cup",            detail:"Condiment cup ÃÂ· 2000/case",           cat:"Sauce", item_code:"1.5oz Sauce", price:40, max_order:4},
-  {id:19, name:"2oz Sauce Cup",              detail:"Condiment cup ÃÂ· 2000/case",           cat:"Sauce", item_code:"2oz Sauce", price:38, max_order:4},
-  {id:59, name:"3.25oz Sauce Cup",           detail:"Condiment cup ÃÂ· 2500/case",           cat:"Sauce", item_code:"3.25oz Sauce", price:68, max_order:4},
-  {id:60, name:"4oz Sauce Cup",              detail:"Condiment cup ÃÂ· 2500/case",           cat:"Sauce", item_code:"4oz Sauce", price:72, max_order:4},
-  {id:61, name:"5oz Sauce Cup",              detail:"Condiment cup",                            cat:"Sauce", item_code:"5oz Sauce", price:78, max_order:4},
+  {id:57, name:"1oz Sauce Cup",              detail:"2500/case",           cat:"Sauce", item_code:"1oz Sauce", price:36, max_order:4},
+  {id:58, name:"1.5oz Sauce Cup",            detail:"2000/case",           cat:"Sauce", item_code:"1.5oz Sauce", price:40, max_order:4},
+  {id:19, name:"2oz Sauce Cup",              detail:"2000/case",           cat:"Sauce", item_code:"2oz Sauce", price:38, max_order:4},
+  {id:59, name:"3.25oz Sauce Cup",           detail:"2500/case",           cat:"Sauce", item_code:"3.25oz Sauce", price:68, max_order:4},
+  {id:60, name:"4oz Sauce Cup",              detail:"2500/case",           cat:"Sauce", item_code:"4oz Sauce", price:72, max_order:4},
+  {id:61, name:"5oz Sauce Cup",              detail:"",                            cat:"Sauce", item_code:"5oz Sauce", price:78, max_order:4},
   // === COLD CUPS ===
-  {id:62, name:"12oz Cold Cup",              detail:"Clear plastic cup ÃÂ· 1000/case",       cat:"Cups", item_code:"12oz Cold Cup", price:78, max_order:4},
-  {id:63, name:"14oz Cold Cup",              detail:"Clear plastic cup ÃÂ· 1000/case",       cat:"Cups", item_code:"14oz Cold Cup", price:83, max_order:4},
-  {id:20, name:"16oz Cold Cup",              detail:"Clear plastic cup ÃÂ· 1000/case",       cat:"Cups", item_code:"16oz Cold Cup", price:88, max_order:4},
-  {id:64, name:"20oz Cold Cup",              detail:"Clear plastic cup ÃÂ· 1000/case",       cat:"Cups", item_code:"20oz Cold Cup", price:90, max_order:4},
-  {id:65, name:"24oz Cold Cup",              detail:"Clear plastic cup ÃÂ· 1000/case",       cat:"Cups", item_code:"24oz Cold Cup", price:95, max_order:4},
+  {id:62, name:"12oz Cold Cup",              detail:"1000/case",       cat:"Cups", item_code:"12oz Cold Cup", price:78, max_order:4},
+  {id:63, name:"14oz Cold Cup",              detail:"1000/case",       cat:"Cups", item_code:"14oz Cold Cup", price:83, max_order:4},
+  {id:20, name:"16oz Cold Cup",              detail:"1000/case",       cat:"Cups", item_code:"16oz Cold Cup", price:88, max_order:4},
+  {id:64, name:"20oz Cold Cup",              detail:"1000/case",       cat:"Cups", item_code:"20oz Cold Cup", price:90, max_order:4},
+  {id:65, name:"24oz Cold Cup",              detail:"1000/case",       cat:"Cups", item_code:"24oz Cold Cup", price:95, max_order:4},
   // === COFFEE CUPS ===
-  {id:66, name:"8oz Coffee Cup",             detail:"Hot cup",                                  cat:"Coffee", item_code:"8oz Coffee", price:68, max_order:4},
-  {id:67, name:"10oz Coffee Cup",            detail:"Hot cup",                                  cat:"Coffee", item_code:"10oz Coffee", price:73, max_order:4},
-  {id:68, name:"12oz Coffee Cup",            detail:"Hot cup",                                  cat:"Coffee", item_code:"12oz Coffee", price:78, max_order:4},
-  {id:69, name:"16oz Coffee Cup",            detail:"Hot cup",                                  cat:"Coffee", item_code:"16oz Coffee", price:83, max_order:4},
+  {id:66, name:"8oz Coffee Cup",             detail:"",                                  cat:"Coffee", item_code:"8oz Coffee", price:68, max_order:4},
+  {id:67, name:"10oz Coffee Cup",            detail:"",                                  cat:"Coffee", item_code:"10oz Coffee", price:73, max_order:4},
+  {id:68, name:"12oz Coffee Cup",            detail:"",                                  cat:"Coffee", item_code:"12oz Coffee", price:78, max_order:4},
+  {id:69, name:"16oz Coffee Cup",            detail:"",                                  cat:"Coffee", item_code:"16oz Coffee", price:83, max_order:4},
   // === TRAYS & CONTAINERS ===
-  {id:70, name:"C53 Clear Tray",             detail:"Clear tray ÃÂ· 500/case",               cat:"Trays", item_code:"C53", price:45, max_order:4},
+  {id:70, name:"C53 Clear Tray",             detail:"500/case",               cat:"Trays", item_code:"C53", price:45, max_order:4},
   {id:71, name:"C57 Container",              detail:"500/case",                                 cat:"Trays", item_code:"C57", price:49, max_order:4},
   {id:72, name:"C90 Container",              detail:"250/case",                                 cat:"Trays", item_code:"C90", price:58, max_order:4},
   {id:73, name:"C12 Container",              detail:"200/case",                                 cat:"Trays", item_code:"C12", price:33, max_order:4},
@@ -346,15 +345,15 @@ const PRODUCTS = [
   {id:76, name:"J8 Container",               detail:"500/case",                                 cat:"Trays", item_code:"J8", price:43, max_order:4},
   {id:77, name:"J12oz Container",            detail:"1000/case",                                cat:"Trays", item_code:"J12oz", price:84, max_order:4},
   {id:78, name:"J8oz Container",             detail:"1000/case",                                cat:"Trays", item_code:"J8oz", price:78, max_order:4},
-  {id:79, name:"TY-48 Container",            detail:"Tray container",                           cat:"Trays", item_code:"TY-48", price:49, max_order:4},
-  {id:80, name:"TY-58 Container",            detail:"Tray container",                           cat:"Trays", item_code:"TY-58", price:64, max_order:4},
+  {id:79, name:"TY-48 Container",            detail:"",                           cat:"Trays", item_code:"TY-48", price:49, max_order:4},
+  {id:80, name:"TY-58 Container",            detail:"",                           cat:"Trays", item_code:"TY-58", price:64, max_order:4},
   {id:81, name:"TY-24B Container",           detail:"150/case",                                 cat:"Trays", item_code:"TY-24B", price:28, max_order:8},
   {id:82, name:"303 Container",              detail:"270/case",                                 cat:"Trays", item_code:"303", price:52, max_order:4},
   {id:83, name:"304 Container",              detail:"250/case",                                 cat:"Trays", item_code:"304", price:52, max_order:4},
   {id:84, name:"820 Container",              detail:"400/case",                                 cat:"Trays", item_code:"820", price:52, max_order:4},
   // === UTENSILS ===
-  {id:85, name:"Fork",                       detail:"Plastic fork",                             cat:"Utensils", item_code:"Fork", price:28, max_order:4},
-  {id:86, name:"Spoon",                      detail:"Plastic spoon",                            cat:"Utensils", item_code:"Spoon", price:8, max_order:4},
+  {id:85, name:"Fork",                       detail:"",                             cat:"Utensils", item_code:"Fork", price:28, max_order:4},
+  {id:86, name:"Spoon",                      detail:"",                            cat:"Utensils", item_code:"Spoon", price:8, max_order:4},
 ];
 
 const IMG = {
@@ -459,7 +458,7 @@ function getProduct(id) {
   const p = PRODUCTS.find(x => x.id === id);
   if (!p) return p;
   const ov = overrides[id] || {};
-  return {...p, oos: ov.oos !== undefined ? ov.oos : p.oos, price: ov.price !== undefined ? ov.price : p.price};
+  return {...p, oos: ov.oos !== undefined ? ov.oos : p.oos, price: ov.price !== undefined ? ov.price : p.price, name: ov.name !== undefined ? ov.name : p.name};
 }
 
 // -- Filters --
@@ -499,8 +498,8 @@ function renderGrid() {
           ${statusBadge}
           <span class="badge badge-cat">${p.cat}</span>
         </div>
-        <div class="prod-name">${prod.oos ? p.name : (getProduct(p.id).name || p.name)}</div>
-        <div class="prod-detail">${p.detail}</div>
+        <div class="prod-name">${prod.name}</div>
+        ${p.detail ? '<div class="prod-detail">' + p.detail + '</div>' : ''}
         ${priceDisplay}
         <div class="qty-row">
           <button class="qty-btn" onclick="changeQty(${p.id},-1)">-</button>
@@ -567,7 +566,7 @@ function renderCart() {
     return `<div class="cart-item">
       <div>
         <div class="cart-item-name">${p.name}</div>
-        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' ÃÂ· $'+lineTotal.toFixed(2) : ''}</div>
+        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' ÃÂÃÂ· $'+lineTotal.toFixed(2) : ''}</div>
       </div>
       <button class="cart-remove" onclick="removeFromCart(${id})">X</button>
     </div>`;
@@ -624,7 +623,7 @@ function generateOrder() {
   if (isEmergency && hour >= 15) {
     emerDays = 2; // after 3PM, next delivery is day after tomorrow
   }
-  const delDate = fmtDate(bizDaysAdd(now, isEmergency ? emerDays : 3));
+  const delDate = fmtDate(bizDaysAdd(now, isEmergency ? emerDays : 7));
   const items = Object.entries(cart).filter(([,v]) => v > 0);
   let total = 0;
   let hasUnknown = false;
@@ -733,7 +732,7 @@ function buildMgrPanel() {
     html += `
     <div class="mgr-product-row" id="mgrrow-${p.id}">
       <div>
-        <div class="mgr-prod-name">${p.name}</div>
+        <input class="mgr-name-input" type="text" id="mgr-name-${p.id}" value="${p.name}" style="font-weight:600;font-size:.85rem;color:var(--navy);border:1px solid var(--border);border-radius:4px;padding:.2rem .4rem;width:100%;font-family:inherit;"/>
         <div class="mgr-prod-detail">${p.detail} ${livePriceTag}</div>
       </div>
       <div>
@@ -778,6 +777,11 @@ function saveMgr() {
       overrides[p.id] = overrides[p.id] || {};
       overrides[p.id].price = parseFloat(priceInput.value);
     }
+    const nameInput = document.getElementById('mgr-name-' + p.id);
+    if (nameInput && nameInput.value !== p.name) {
+      overrides[p.id] = overrides[p.id] || {};
+      overrides[p.id].name = nameInput.value;
+    }
   });
   closeMgr();
   renderGrid();
@@ -792,123 +796,6 @@ renderGrid();
 updateEmergencyDisplay();
 fetchStockStatus();
 </script>
+<script src="supabase-orders.js"></script>
 </body>
-  <script src="supabase-orders.js"></script>
-</html>
- + (total + rushFee).toFixed(2) : '';
-  const rush = isEmergency ? '\n!! EMERGENCY ORDER !! - +$10 rush fee' + (hour >= 15 ? '\n(Ordered after 3PM - delivery pushed to ' + delDate + ')' : '') : '';
-  const notesLine = notes ? `\nNotes: ${notes}` : '';
-  const msg = `BOS Paper Co. Order\n${'-'.repeat(28)}\nFrom: ${name}\nPhone: ${phone}\nDelivery: ${delType==='emer'?'EMERGENCY':'Standard'}  -  ${delDate}${rush}\n\nItems:\n${lines.join('\n')}${totalStr}${notesLine}\n${'-'.repeat(28)}`;
-  document.getElementById('orderMsg').textContent = msg;
-  document.getElementById('orderResult').style.display = 'block';
-  document.getElementById('genBtn').textContent = '+ Order Ready  -  Edit Above if Needed';
-}
-function sendSMS() {
-  const msg = document.getElementById('orderMsg').textContent;
-  window.location.href = 'sms:+16175551234?body=' + encodeURIComponent(msg);
-}
-function sendLine() {
-  window.open('https://line.me/ti/p/~tobvv', '_blank');
-}
-function copyOrder() {
-  const msg = document.getElementById('orderMsg').textContent;
-  navigator.clipboard.writeText(msg).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '\u2713 Copied!';
-    setTimeout(() => { btn.innerHTML = '&#128203; Copy'; }, 2000);
-  });
-}
-function scrollToCart() {
-  document.querySelector('.order-panel').scrollIntoView({behavior:'smooth'});
-}
-
-// -- Manager Mode --
-function openMgr() {
-  document.getElementById('mgrOverlay').classList.add('open');
-  document.getElementById('mgrPw').value = '';
-  document.getElementById('mgrErr').textContent = '';
-  document.getElementById('mgrAuth').style.display = '';
-  document.getElementById('mgrPanel').style.display = 'none';
-  document.getElementById('mgrBtn').classList.add('active');
-  setTimeout(() => document.getElementById('mgrPw').focus(), 100);
-}
-function closeMgr() {
-  document.getElementById('mgrOverlay').classList.remove('open');
-  document.getElementById('mgrBtn').classList.remove('active');
-}
-function closeMgrIfOutside(e) {
-  if (e.target === document.getElementById('mgrOverlay')) closeMgr();
-}
-function checkPw() {
-  const pw = document.getElementById('mgrPw').value;
-  if (pw === ADMIN_PW) {
-    document.getElementById('mgrAuth').style.display = 'none';
-    document.getElementById('mgrPanel').style.display = 'flex';
-    buildMgrPanel();
-  } else {
-    document.getElementById('mgrErr').textContent = 'Incorrect password.';
-    document.getElementById('mgrPw').select();
-  }
-}
-function buildMgrPanel() {
-  const body = document.getElementById('mgrBody');
-  let html = '';
-  let lastCat = '';
-  PRODUCTS.forEach(p => {
-    if (p.cat !== lastCat) {
-      html += `<div class="mgr-cat-label">${p.cat}</div>`;
-      lastCat = p.cat;
-    }
-    const prod = getProduct(p.id);
-    const isIn = !prod.oos;
-    const price = prod.price !== null && prod.price !== undefined ? prod.price : '';
-    html += `
-    <div class="mgr-product-row" id="mgrrow-${p.id}">
-      <div>
-        <div class="mgr-prod-name">${p.name}</div>
-        <div class="mgr-prod-detail">${p.detail}</div>
-      </div>
-      <div>
-        <div style="font-size:.65rem;color:var(--gray);margin-bottom:.2rem;text-align:center;">Price/case</div>
-        <input class="mgr-price-input" type="number" id="mgr-price-${p.id}" value="${price}" placeholder=" - " min="0" step="0.01"/>
-      </div>
-      <div class="toggle-wrap">
-        <label class="toggle">
-          <input type="checkbox" id="mgr-tog-${p.id}" ${isIn ? 'checked' : ''} onchange="updateToggleLabel(${p.id})"/>
-          <span class="toggle-slider"></span>
-        </label>
-        <span class="toggle-label" id="mgr-lbl-${p.id}">${isIn ? 'ON' : 'OFF'}</span>
-      </div>
-    </div>`;
-  });
-  body.innerHTML = html;
-}
-function updateToggleLabel(id) {
-  const on = document.getElementById('mgr-tog-' + id).checked;
-  document.getElementById('mgr-lbl-' + id).textContent = on ? 'ON' : 'OFF';
-}
-function saveMgr() {
-  PRODUCTS.forEach(p => {
-    const tog = document.getElementById('mgr-tog-' + p.id);
-    const priceInput = document.getElementById('mgr-price-' + p.id);
-    if (tog) {
-      overrides[p.id] = overrides[p.id] || {};
-      overrides[p.id].oos = !tog.checked;
-    }
-    if (priceInput && priceInput.value !== '') {
-      overrides[p.id] = overrides[p.id] || {};
-      overrides[p.id].price = parseFloat(priceInput.value);
-    }
-  });
-  closeMgr();
-  renderGrid();
-  renderCart();
-}
-
-// -- Init --
-buildFilters();
-renderGrid();
-</script>
-</body>
-  <script src="supabase-orders.js"></script>
 </html>
