@@ -124,6 +124,17 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 .mgr-section-header .section-title{font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);font-weight:600;}
 .mgr-live-price{font-size:.68rem;color:var(--green);font-weight:600;margin-left:.3rem;}
 
+
+/* -- MANAGER DELETE + ADD -- */
+.mgr-del-btn{background:none;border:none;color:var(--gray-lt);cursor:pointer;font-size:1.1rem;padding:0 .3rem;transition:color .15s;line-height:1;}
+.mgr-del-btn:hover{color:var(--red);}
+.mgr-add-section{border-top:2px solid var(--border);margin-top:1rem;padding-top:1rem;}
+.mgr-add-row{display:grid;grid-template-columns:1fr auto auto;gap:.5rem;align-items:end;}
+.mgr-add-input{border:1.5px solid var(--border);border-radius:5px;padding:.4rem .6rem;font-size:.83rem;font-family:'Nunito',sans-serif;}
+.mgr-add-input:focus{outline:none;border-color:var(--navy);}
+.mgr-add-btn{font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:.45rem .8rem;background:var(--green);color:#fff;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;}
+.mgr-add-btn:hover{opacity:.88;}
+.mgr-deleted-label{font-size:.7rem;color:var(--red);font-weight:600;text-decoration:line-through;opacity:.5;}
 /* -- MANAGER MODAL -- */
 .mgr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;padding:1rem;}
 .mgr-overlay.open{display:flex;}
@@ -139,7 +150,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 .mgr-auth button{font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;padding:.5rem 1.6rem;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;}
 .mgr-auth .err{color:var(--red);font-size:.8rem;margin-top:.5rem;}
 .mgr-body{overflow-y:auto;padding:1rem 1.4rem;flex:1;}
-.mgr-product-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:.8rem;padding:.65rem 0;border-bottom:1px solid var(--border);}
+.mgr-product-row{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:.8rem;padding:.65rem 0;border-bottom:1px solid var(--border);}
 .mgr-product-row:last-child{border-bottom:none;}
 .mgr-prod-name{font-weight:600;font-size:.85rem;color:var(--navy);}
 .mgr-prod-detail{font-size:.72rem;color:var(--gray);}
@@ -174,7 +185,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
 <!-- WELCOME -->
 <div class="welcome">
   <h2>BOS Paper Co.  -  Restaurant Supply</h2>
-  <p>Browse &amp; order below · Orders confirmed by BOS directly</p>
+  <p>Browse &amp; order below Â· Orders confirmed by BOS directly</p>
 </div>
 
 <!-- FILTERS -->
@@ -195,7 +206,7 @@ header{background:var(--white);border-bottom:3px solid var(--navy);padding:0 1.5
     <div class="del-opts" id="delOpts">
       <label class="del-opt selected" id="opt-std">
         <input type="radio" name="del" value="std" checked/>
-        <div><div class="del-opt-title">Standard  -  3 Business Days</div><div class="del-opt-sub">Free delivery</div></div>
+        <div><div class="del-opt-title">Standard  -  7 Business Days</div><div class="del-opt-sub">Free delivery</div></div>
       </label>
       <label class="del-opt" id="opt-emer">
         <input type="radio" name="del" value="emer"/>
@@ -415,9 +426,11 @@ function fetchStockStatus() {
 }
 
 let cart = {};
-let overrides = {};  // id -> {oos, price}
+let overrides = JSON.parse(localStorage.getItem('bos_overrides') || '{}');
+let deletedItems = JSON.parse(localStorage.getItem('bos_deleted') || '[]');
+let customItems = JSON.parse(localStorage.getItem('bos_custom') || '[]');
 let activeFilter = 'All';
-let emergencyEnabled = true;
+let emergencyEnabled = JSON.parse(localStorage.getItem('bos_emergency') || 'true');
 let livePrices = {};  // item_code -> price from master sheet
 
 // -- Toast popup --
@@ -455,7 +468,7 @@ function fmtPrice(p) {
   return '$' + Number(p).toFixed(2);
 }
 function getProduct(id) {
-  const p = PRODUCTS.find(x => x.id === id);
+  const p = PRODUCTS.find(x => x.id === id) || customItems.find(x => x.id === id);
   if (!p) return p;
   const ov = overrides[id] || {};
   return {...p, oos: ov.oos !== undefined ? ov.oos : p.oos, price: ov.price !== undefined ? ov.price : p.price, name: ov.name !== undefined ? ov.name : p.name};
@@ -464,7 +477,7 @@ function getProduct(id) {
 // -- Filters --
 function buildFilters() {
   const bar = document.getElementById('filterBar');
-  const cats = ['All', ...new Set(PRODUCTS.map(p => p.cat))];
+  const cats = ['All', ...new Set(PRODUCTS.filter(p => !deletedItems.includes(p.id)).concat(customItems).map(p => p.cat))];
   bar.innerHTML = cats.map(c =>
     `<button class="filter-btn${c === activeFilter ? ' active' : ''}" onclick="setFilter('${c}')">${c}</button>`
   ).join('');
@@ -478,7 +491,8 @@ function setFilter(cat) {
 // -- Grid --
 function renderGrid() {
   const grid = document.getElementById('prodGrid');
-  const list = activeFilter === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeFilter);
+  const allProds = PRODUCTS.filter(p => !deletedItems.includes(p.id)).concat(customItems.filter(p => !deletedItems.includes(p.id)));
+  const list = activeFilter === 'All' ? allProds : allProds.filter(p => p.cat === activeFilter);
   grid.innerHTML = list.map(p => {
     const prod = getProduct(p.id);
     const qty = cart[p.id] || 0;
@@ -566,7 +580,7 @@ function renderCart() {
     return `<div class="cart-item">
       <div>
         <div class="cart-item-name">${p.name}</div>
-        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' · $'+lineTotal.toFixed(2) : ''}</div>
+        <div class="cart-item-detail">${qty} case${qty>1?'s':''}${lineTotal ? ' Â· $'+lineTotal.toFixed(2) : ''}</div>
       </div>
       <button class="cart-remove" onclick="removeFromCart(${id})">X</button>
     </div>`;
@@ -746,8 +760,34 @@ function buildMgrPanel() {
         </label>
         <span class="toggle-label" id="mgr-lbl-${p.id}">${isIn ? 'ON' : 'OFF'}</span>
       </div>
+      <button class="mgr-del-btn" onclick="mgrDeleteItem(${p.id})" title="Delete item">&#10005;</button>
     </div>`;
   });
+  // Render custom items
+  if (customItems.length > 0) {
+    html += '<div class="mgr-cat-label">Custom Items</div>';
+    customItems.forEach(p => {
+      const prod = getProduct(p.id);
+      const isIn = !prod.oos;
+      const price = prod.price !== null && prod.price !== undefined ? prod.price : '';
+      html += '<div class="mgr-product-row" id="mgrrow-' + p.id + '">' +
+        '<div><input class="mgr-name-input" type="text" id="mgr-name-' + p.id + '" value="' + (overrides[p.id] && overrides[p.id].name ? overrides[p.id].name : p.name) + '" style="font-weight:600;font-size:.85rem;color:var(--navy);border:1px solid var(--border);border-radius:4px;padding:.2rem .4rem;width:100%;font-family:inherit;"/>' +
+        '<div class="mgr-prod-detail">' + p.detail + '</div></div>' +
+        '<div><div style="font-size:.65rem;color:var(--gray);margin-bottom:.2rem;text-align:center;">Price/case</div>' +
+        '<input class="mgr-price-input" type="number" id="mgr-price-' + p.id + '" value="' + price + '" placeholder="-" min="0" step="0.01"/></div>' +
+        '<div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="mgr-tog-' + p.id + '" ' + (isIn ? 'checked' : '') + ' onchange="updateToggleLabel(' + p.id + ')"/><span class="toggle-slider"></span></label>' +
+        '<span class="toggle-label" id="mgr-lbl-' + p.id + '">' + (isIn ? 'ON' : 'OFF') + '</span></div>' +
+        '<button class="mgr-del-btn" onclick="mgrDeleteItem(' + p.id + ')" title="Delete">&#10005;</button></div>';
+    });
+  }
+  // Add Item section
+  html += '<div class="mgr-add-section">' +
+    '<div class="mgr-cat-label">Add New Item</div>' +
+    '<div class="mgr-add-row">' +
+    '<input class="mgr-add-input" type="text" id="mgr-add-name" placeholder="Item name"/>' +
+    '<input class="mgr-add-input" type="number" id="mgr-add-price" placeholder="Price" min="0" step="0.01" style="width:80px;"/>' +
+    '<button class="mgr-add-btn" onclick="mgrAddItem()">+ Add</button>' +
+    '</div></div>';
   body.innerHTML = html;
 }
 
@@ -761,12 +801,37 @@ function updateToggleLabel(id) {
   const on = document.getElementById('mgr-tog-' + id).checked;
   document.getElementById('mgr-lbl-' + id).textContent = on ? 'ON' : 'OFF';
 }
+function mgrDeleteItem(id) {
+  if (!deletedItems.includes(id)) deletedItems.push(id);
+  // Remove from custom items if it's custom
+  customItems = customItems.filter(p => p.id !== id);
+  const row = document.getElementById('mgrrow-' + id);
+  if (row) row.style.display = 'none';
+  showToast('Item removed (save to apply)', '&#10005;');
+}
+function mgrAddItem() {
+  const nameInput = document.getElementById('mgr-add-name');
+  const priceInput = document.getElementById('mgr-add-price');
+  const name = nameInput.value.trim();
+  const price = priceInput.value ? parseFloat(priceInput.value) : null;
+  if (!name) { showToast('Enter item name', '&#9888;'); return; }
+  const newId = 9000 + customItems.length + Math.floor(Math.random()*900);
+  const item = {id: newId, name: name, detail: '', cat: 'Custom', item_code: '', price: price, max_order: 10, oos: false};
+  customItems.push(item);
+  overrides[newId] = {name: name, price: price, oos: false};
+  nameInput.value = '';
+  priceInput.value = '';
+  buildMgrPanel();
+  showToast('Item added (save to apply)', '&#10003;');
+}
 function saveMgr() {
   // Save emergency toggle
   const emerTog = document.getElementById('mgr-emer-toggle');
   if (emerTog) emergencyEnabled = emerTog.checked;
-  // Save product overrides
-  PRODUCTS.forEach(p => {
+  localStorage.setItem('bos_emergency', JSON.stringify(emergencyEnabled));
+  // Save product overrides (PRODUCTS + custom items)
+  const allItems = PRODUCTS.concat(customItems);
+  allItems.forEach(p => {
     const tog = document.getElementById('mgr-tog-' + p.id);
     const priceInput = document.getElementById('mgr-price-' + p.id);
     if (tog) {
@@ -778,12 +843,16 @@ function saveMgr() {
       overrides[p.id].price = parseFloat(priceInput.value);
     }
     const nameInput = document.getElementById('mgr-name-' + p.id);
-    if (nameInput && nameInput.value !== p.name) {
+    if (nameInput && nameInput.value.trim() !== '') {
       overrides[p.id] = overrides[p.id] || {};
-      overrides[p.id].name = nameInput.value;
+      overrides[p.id].name = nameInput.value.trim();
     }
   });
+  localStorage.setItem('bos_overrides', JSON.stringify(overrides));
+  localStorage.setItem('bos_deleted', JSON.stringify(deletedItems));
+  localStorage.setItem('bos_custom', JSON.stringify(customItems));
   closeMgr();
+  buildFilters();
   renderGrid();
   renderCart();
   updateEmergencyDisplay();
