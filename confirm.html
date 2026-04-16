@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOS Paper Co. — Order Confirmation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#1a1a2e;color:#eee;min-height:100vh;padding:20px}
+.container{max-width:480px;margin:0 auto}
+.logo{text-align:center;margin-bottom:20px}
+.logo h1{color:#e94560;font-size:1.3rem;letter-spacing:2px}
+.logo p{color:#888;font-size:0.75rem;margin-top:4px}
+.card{background:#16213e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.08)}
+.card h2{font-size:1rem;color:#e94560;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;padding:6px 0;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.06)}
+.row:last-child{border-bottom:none}
+.row .label{color:#888}
+.row .value{color:#eee;font-weight:500;text-align:right}
+.items-list{margin-top:8px}
+.item-row{display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:4px;font-size:0.85rem}
+.item-row .name{color:#ddd}
+.item-row .qty{color:#4ecdc4;font-weight:700}
+.urgent-badge{display:inline-block;background:#e94560;color:#fff;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:1px;margin-bottom:8px}
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.btn{flex:1;padding:16px;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-confirm{background:#4CAF50;color:#fff}
+.btn-confirm:hover{background:#43a047}
+.btn-reject{background:#ff6b6b;color:#fff}
+.btn-reject:hover{background:#e55555}
+.btn-partial{background:#ff9800;color:#fff;margin-top:10px;width:100%;padding:14px;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer}
+.btn-partial:hover{background:#f57c00}
+.partial-box{display:none;margin-top:12px}
+.partial-box textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#eee;padding:10px;font-size:0.85rem;resize:vertical;font-family:inherit;min-height:60px}
+.partial-box .btn-send{margin-top:8px;background:#ff9800;color:#fff;padding:12px;border:none;border-radius:8px;width:100%;font-size:0.9rem;font-weight:600;cursor:pointer}
+.result{text-align:center;padding:40px 20px;display:none}
+.result.active{display:block}
+.result h2{font-size:1.3rem;margin-bottom:8px}
+.result p{color:#888;font-size:0.9rem}
+.result.confirmed h2{color:#4CAF50}
+.result.rejected h2{color:#ff6b6b}
+.result.partial h2{color:#ff9800}
+.loading{text-align:center;padding:60px 20px;color:#888}
+.error{text-align:center;padding:40px 20px;color:#ff6b6b}
+.phone-link{display:block;text-align:center;margin-top:16px;color:#e94560;font-size:0.85rem;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="logo">
+<h1>BOS PAPER CO.</h1>
+<p>Order Confirmation</p>
+</div>
+
+<div id="loadingView" class="loading">Loading order...</div>
+<div id="errorView" class="error" style="display:none"></div>
+
+<div id="orderView" style="display:none">
+<div class="card">
+<div id="urgentBadge" class="urgent-badge" style="display:none">EMERGENCY OVERNIGHT</div>
+<h2>Order <span id="orderRef"></span></h2>
+<div class="row"><span class="label">Restaurant</span><span class="value" id="orderRestaurant"></span></div>
+<div class="row"><span class="label">Phone</span><span class="value" id="orderPhone"></span></div>
+<div class="row"><span class="label">Delivery</span><span class="value" id="orderDelivery"></span></div>
+<div class="row"><span class="label">Submitted</span><span class="value" id="orderTime"></span></div>
+</div>
+
+<div class="card">
+<h2>Items</h2>
+<div class="items-list" id="itemsList"></div>
+</div>
+
+<div id="actionButtons">
+<div class="btn-row">
+<button class="btn btn-confirm" onclick="confirmOrder()">Confirm</button>
+<button class="btn btn-reject" onclick="rejectOrder()">Reject</button>
+</div>
+<button class="btn-partial" onclick="showPartial()">Some items unavailable...</button>
+<div class="partial-box" id="partialBox">
+<textarea id="partialNote" placeholder="Which items are unavailable? e.g. 'no noodle bowls, out of sauce cups'"></textarea>
+<button class="btn-send" onclick="partialOrder()">Send Update</button>
+</div>
+</div>
+
+<a class="phone-link" href="tel:+18578806449">Call BOS: (857) 880-6449</a>
+</div>
+
+<div id="confirmedResult" class="result confirmed">
+<h2>Order Confirmed</h2>
+<p>Javis will process this delivery and update all docs.</p>
+</div>
+
+<div id="rejectedResult" class="result rejected">
+<h2>Order Rejected</h2>
+<p>Order has been cancelled.</p>
+</div>
+
+<div id="partialResult" class="result partial">
+<h2>Update Sent</h2>
+<p>Javis will draft a message to the customer about unavailable items.</p>
+</div>
+</div>
+
+<script>
+const SUPABASE_URL="https://agbxkuaedwallthbpphe.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnYnhrdWFlZHdhbGx0aGJwcGhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjkzNzYsImV4cCI6MjA5MTM0NTM3Nn0.qlLE8cYxAVV09yKnyJtC1ShosJPL70ISPugrEFQp1jQ";
+const HEADERS={"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY};
+
+// Get order ID from URL: confirm.html?id=xxx
+const params=new URLSearchParams(window.location.search);
+const orderId=params.get("id");
+let orderData=null;
+
+async function loadOrder(){
+  if(!orderId){showError("No order ID provided.");return;}
+  try{
+    const res=await fetch(SUPABASE_URL+"/rest/v1/orders?id=eq."+orderId+"&select=*",{headers:HEADERS});
+    const data=await res.json();
+    if(!data||data.length===0){showError("Order not found.");return;}
+    orderData=data[0];
+    if(orderData.status==="confirmed"){showResult("confirmedResult");return;}
+    if(orderData.status==="rejected"){showResult("rejectedResult");return;}
+    if(orderData.status==="partial"){showResult("partialResult");return;}
+    renderOrder(orderData);
+  }catch(e){showError("Failed to load order: "+e.message);}
+}
+
+function renderOrder(o){
+  document.getElementById("loadingView").style.display="none";
+  document.getElementById("orderView").style.display="block";
+  document.getElementById("orderRef").textContent=o.ref||o.id.substring(0,8);
+  document.getElementById("orderRestaurant").textContent=o.restaurant||"Unknown";
+  document.getElementById("orderPhone").textContent=o.phone||"N/A";
+  document.getElementById("orderDelivery").textContent=o.delivery_type==="emergency"?"Emergency Overnight (+$15)":"Standard (7 days)";
+  if(o.delivery_type==="emergency") document.getElementById("urgentBadge").style.display="inline-block";
+  const d=new Date(o.created_at);
+  document.getElementById("orderTime").textContent=d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  const list=document.getElementById("itemsList");
+  (o.items||[]).forEach(function(item){
+    const row=document.createElement("div");
+    row.className="item-row";
+    row.innerHTML='<span class="name">'+item.product+'</span><span class="qty">x'+item.qty+'</span>';
+    list.appendChild(row);
+  });
+}
+
+async function updateOrder(status,notes){
+  const body={status:status};
+  if(notes) body.notes=(orderData.notes||"")+"\n[BOSS]: "+notes;
+  await fetch(SUPABASE_URL+"/rest/v1/orders?id=eq."+orderId,{method:"PATCH",headers:{...HEADERS,"Prefer":"return=representation"},body:JSON.stringify(body)});
+}
+
+async function confirmOrder(){
+  document.getElementById("actionButtons").style.display="none";
+  await updateOrder("confirmed");
+  showResult("confirmedResult");
+}
+
+async function rejectOrder(){
+  document.getElementById("actionButtons").style.display="none";
+  await updateOrder("rejected");
+  showResult("rejectedResult");
+}
+
+function showPartial(){
+  document.getElementById("partialBox").style.display="block";
+}
+
+async function partialOrder(){
+  const note=document.getElementById("partialNote").value.trim();
+  if(!note){alert("Please describe what's unavailable.");return;}
+  document.getElementById("actionButtons").style.display="none";
+  await updateOrder("partial",note);
+  showResult("partialResult");
+}
+
+function showResult(id){
+  document.getElementById("loadingView").style.display="none";
+  document.getElementById("orderView").style.display="none";
+  document.getElementById(id).classList.add("active");
+}
+
+function showError(msg){
+  document.getElementById("loadingView").style.display="none";
+  document.getElementById("errorView").style.display="block";
+  document.getElementById("errorView").textContent=msg;
+}
+
+loadOrder();
+</script>
+</body>
+</html>
