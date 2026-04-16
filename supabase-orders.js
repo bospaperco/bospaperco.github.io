@@ -6,7 +6,7 @@
 
 (function() {
   var SUPABASE_URL = "https://agbxkuaedwallthbpphe.supabase.co";
-  var SUPABASE_KEY = "sb_publishable_11fEmR1b5UCmH6xQipclfA_Sya9fAc4";
+  var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnYnhrdWFlZHdhbGx0aGJwcGhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjkzNzYsImV4cCI6MjA5MTM0NTM3Nn0.qlLE8cYxAVV09yKnyJtC1ShosJPL70ISPugrEFQp1jQ";
   var WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwKrrzepBq5XTxuEJCcHKkYCACWlWxBt2ftkYM3yxPTTXyTAEAyPIFN5MmuAszNgMqV3A/exec";
   var MAX_RETRIES = 5;
   var RETRY_DELAY_MS = 1000;
