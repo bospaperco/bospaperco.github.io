@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOS Paper Co. — Inventory Tracker</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1B2A4A;--navy-light:#243556;--gray:#E8ECF1;--gray-dark:#B0B8C4;--accent:#4A90D9;--green:#28A745;--red:#DC3545;--orange:#F5A623;--white:#FFFFFF;--text:#1B2A4A;--text-light:#5A6577}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray);color:var(--text);min-height:100vh}
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,#2C3E6B 100%);padding:20px}
+#loginScreen .logo-text{font-size:28px;font-weight:800;color:var(--white);letter-spacing:2px;margin-bottom:8px}
+#loginScreen .sub-text{color:var(--gray-dark);font-size:14px;margin-bottom:32px}
+#loginScreen input{width:200px;padding:14px 20px;border:2px solid rgba(255,255,255,0.2);border-radius:12px;background:rgba(255,255,255,0.1);color:var(--white);font-size:18px;text-align:center;letter-spacing:8px;outline:none;transition:border-color 0.2s}
+#loginScreen input:focus{border-color:var(--accent)}
+#loginScreen input::placeholder{color:rgba(255,255,255,0.3);letter-spacing:2px;font-size:14px}
+#loginScreen .login-error{color:var(--red);font-size:13px;margin-top:12px;min-height:20px}
+header{background:var(--navy);color:var(--white);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+header h1{font-size:18px;font-weight:700;letter-spacing:1px}
+header .header-sub{font-size:11px;color:var(--gray-dark);margin-top:2px}
+.header-btns{display:flex;gap:8px}
+.header-btn{background:none;border:1px solid rgba(255,255,255,0.3);color:var(--white);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer}
+.tab-bar{display:flex;background:var(--navy-light);border-bottom:2px solid var(--accent)}
+.tab-btn{flex:1;padding:12px 8px;text-align:center;color:var(--gray-dark);font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;transition:all 0.2s;position:relative}
+.tab-btn.active{color:var(--white)}
+.tab-btn.active::after{content:'';position:absolute;bottom:-2px;left:10%;width:80%;height:3px;background:var(--accent);border-radius:2px 2px 0 0}
+.tab-content{display:none;padding:16px;max-width:600px;margin:0 auto}
+.tab-content.active{display:block}
+.card{background:var(--white);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.card h3{font-size:15px;color:var(--navy);margin-bottom:8px}
+.item-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray)}
+.item-row:last-child{border-bottom:none}
+.item-name{font-size:14px;font-weight:500;flex:1}
+.qty-controls{display:flex;align-items:center;gap:8px}
+.qty-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--navy);background:var(--white);color:var(--navy);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.qty-btn:active{background:var(--navy);color:var(--white);transform:scale(0.92)}
+.qty-val{min-width:28px;text-align:center;font-size:16px;font-weight:700;color:var(--navy)}
+.qty-val.has-val{color:var(--accent)}
+.action-btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:12px;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.action-btn:active{transform:scale(0.98)}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-success{background:var(--green);color:var(--white)}
+.btn-danger{background:var(--red);color:var(--white)}
+.client-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.client-chip{padding:12px 8px;border-radius:10px;border:2px solid var(--gray-dark);background:var(--white);text-align:center;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.client-chip.selected{border-color:var(--accent);background:var(--accent);color:var(--white)}
+.client-chip:active{transform:scale(0.95)}
+.dash-section{margin-bottom:20px}
+.dash-section h2{font-size:16px;color:var(--navy);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--accent)}
+.car-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--white);border-radius:8px;margin-bottom:6px}
+.car-item .item-qty{font-weight:700;color:var(--accent);font-size:16px}
+.car-item.low{border-left:3px solid var(--orange)}
+.car-item.empty{border-left:3px solid var(--red);opacity:0.5}
+.delivery-card{background:var(--white);border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid var(--green)}
+.delivery-card .del-header{display:flex;justify-content:space-between;margin-bottom:6px}
+.delivery-card .del-client{font-weight:700;color:var(--navy)}
+.delivery-card .del-time{font-size:12px;color:var(--text-light)}
+.delivery-card .del-items{font-size:13px;color:var(--text-light)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:var(--white);padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-light)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:150;align-items:center;justify-content:center;padding:20px}
+.overlay.show{display:flex}
+.overlay-card{background:var(--white);border-radius:16px;padding:24px;max-width:400px;width:100%;max-height:80vh;overflow-y:auto}
+.overlay-card h2{font-size:18px;color:var(--navy);margin-bottom:16px}
+.overlay-card .summary-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid var(--gray)}
+.overlay-card .summary-row:last-child{border-bottom:none}
+.overlay-actions{display:flex;gap:10px;margin-top:20px}
+.overlay-actions button{flex:1;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-cancel{background:var(--gray);color:var(--text)}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:var(--white);border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.refresh-btn{background:none;border:1px solid var(--gray-dark);color:var(--text-light);padding:6px 16px;border-radius:8px;font-size:12px;cursor:pointer;margin-bottom:12px}
+/* HELP OVERLAY */
+.help-content{font-size:14px;line-height:1.6;color:var(--text)}
+.help-content h3{color:var(--navy);font-size:15px;margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--gray)}
+.help-content h3:first-child{border-top:none;margin-top:0;padding-top:0}
+.help-content .step{display:flex;gap:10px;margin-bottom:8px}
+.help-content .step-num{background:var(--accent);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px}
+.help-content .step-text{flex:1}
+.cat-label{font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;padding:10px 0 4px;margin-top:8px;border-top:1px solid var(--gray)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--gray-dark);border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="logo-text">BOS PAPER CO.</div>
+  <div class="sub-text">Inventory Tracker</div>
+  <input type="password" id="passInput" placeholder="PIN" maxlength="4" inputmode="numeric">
+  <div class="login-error" id="loginError"></div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none">
+  <header>
+    <div>
+      <h1>BOS INVENTORY</h1>
+      <div class="header-sub" id="headerDate"></div>
+    </div>
+    <div class="header-btns">
+      <button class="header-btn" id="helpBtn">?</button>
+      <button class="header-btn" id="logoutBtn">Lock</button>
+    </div>
+  </header>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="loadout">Load Out</button>
+    <button class="tab-btn" data-tab="deliver">Confirm Drop</button>
+    <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+  </div>
+
+  <!-- TAB 1: LOAD OUT -->
+  <div id="tab-loadout" class="tab-content active">
+    <div class="card">
+      <h3>Loading car from garage</h3>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:12px">Items in Danvers shelf order. Tap + for each case.</p>
+      <div id="loadoutItems"></div>
+    </div>
+    <!-- ADD NEW ITEM -->
+    <div class="card" id="addItemCard">
+      <h3>Add New Item</h3>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:10px">Item not on the list? Add it here.</p>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" id="newItemName" placeholder="Item name (e.g. 28oz 2-Part)" style="flex:1;padding:10px 12px;border:2px solid var(--gray-dark);border-radius:8px;font-size:14px;outline:none">
+        <input type="number" id="newItemQty" placeholder="Qty" min="1" value="1" style="width:60px;padding:10px 8px;border:2px solid var(--gray-dark);border-radius:8px;font-size:14px;text-align:center;outline:none" inputmode="numeric">
+      </div>
+      <button class="action-btn btn-primary" id="addNewItemBtn" style="margin-top:0;padding:12px;font-size:14px">+ Add to Load Out</button>
+      <div id="customItemsList" style="margin-top:10px"></div>
+    </div>
+    <button class="action-btn btn-primary" id="confirmLoadBtn">Confirm Load Out</button>
+  </div>
+
+  <!-- TAB 2: CONFIRM DROP -->
+  <div id="tab-deliver" class="tab-content">
+    <div class="card">
+      <h3>Select client</h3>
+      <div class="client-grid" id="clientGrid"></div>
+    </div>
+    <div class="card" id="deliverItemsCard" style="display:none">
+      <h3>Items delivered to <span id="deliverClient"></span></h3>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:12px">Tap + for each case dropped</p>
+      <div id="deliverItems"></div>
+    </div>
+    <!-- ADD NEW ITEM FOR DROP -->
+    <div class="card" id="addDropItemCard" style="display:none">
+      <h3>Add New Item to Drop</h3>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="text" id="newDropItemName" placeholder="Item name" style="flex:1;padding:10px 12px;border:2px solid var(--gray-dark);border-radius:8px;font-size:14px;outline:none">
+        <input type="number" id="newDropItemQty" placeholder="Qty" min="1" value="1" style="width:60px;padding:10px 8px;border:2px solid var(--gray-dark);border-radius:8px;font-size:14px;text-align:center;outline:none" inputmode="numeric">
+      </div>
+      <button class="action-btn btn-success" id="addNewDropItemBtn" style="margin-top:0;padding:12px;font-size:14px">+ Add to Drop</button>
+      <div id="customDropItemsList" style="margin-top:10px"></div>
+    </div>
+    <button class="action-btn btn-success" id="confirmDropBtn" style="display:none">Confirm Drop</button>
+  </div>
+
+  <!-- TAB 3: DASHBOARD -->
+  <div id="tab-dashboard" class="tab-content">
+    <button class="refresh-btn" id="refreshDash">Refresh</button>
+    <div class="dash-section">
+      <h2>Garage Stock</h2>
+      <div id="garageStock"></div>
+    </div>
+    <div class="dash-section">
+      <h2>In the Car</h2>
+      <div id="carStock"></div>
+    </div>
+    <div class="dash-section">
+      <h2>Recent Deliveries</h2>
+      <div id="recentDeliveries"></div>
+    </div>
+    <div class="dash-section">
+      <h2>Today's Load Outs</h2>
+      <div id="todayLoadouts"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM OVERLAY -->
+<div class="overlay" id="confirmOverlay">
+  <div class="overlay-card">
+    <h2 id="overlayTitle">Confirm</h2>
+    <div id="overlaySummary"></div>
+    <div class="overlay-actions">
+      <button class="btn-cancel" id="overlayCancel">Cancel</button>
+      <button class="btn-primary" id="overlayConfirm" style="color:#fff">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- HELP OVERLAY -->
+<div class="overlay" id="helpOverlay">
+  <div class="overlay-card">
+    <h2>How to Use</h2>
+    <div class="help-content">
+      <h3>Before leaving the garage</h3>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Open <b>Load Out</b> tab</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Tap <b>+</b> for every case you put in the car</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Tap <b>Confirm Load Out</b></div></div>
+
+      <h3>At each client</h3>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Open <b>Confirm Drop</b> tab</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Tap the <b>client name</b> (SWD, KIIN, etc.)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Tap <b>+</b> for every case you give them</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Tap <b>Confirm Drop</b></div></div>
+
+      <h3>That's it!</h3>
+      <p>Javis auto-calculates what came back to the garage at end of day. You don't need to count leftovers.</p>
+      <p style="margin-top:8px"><b>Dashboard</b> tab shows what's currently in the car and recent deliveries.</p>
+      <p style="margin-top:8px"><b>PIN: ask BOS</b></p>
+    </div>
+    <div class="overlay-actions" style="margin-top:20px">
+      <button class="btn-primary" id="helpClose" style="color:#fff">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const SUPABASE_URL = 'https://agbxkuaedwallthbpphe.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnYnhrdWFlZHdhbGx0aGJwcGhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjkzNzYsImV4cCI6MjA5MTM0NTM3Nn0.qlLE8cYxAVV09yKnyJtC1ShosJPL70ISPugrEFQp1jQ';
+const MANAGER_PIN = '1305';
+
+// ============================================================
+// PRODUCT CATALOG — Danvers garage shelf order (set by BOS 4/18/2026)
+// ============================================================
+const PRODUCTS = [
+  // Shelf order matches physical garage layout
+  { name: '20lb Bag', cat: 'Bags' },
+  { name: 'Bag L (Large Handle)', cat: 'Bags' },
+  { name: 'Bag M (Medium Handle)', cat: 'Bags' },
+  { name: '#1 Paper Box', cat: 'Boxes' },
+  { name: '1/8 Paper Bag', cat: 'Bags' },
+  { name: '28oz Rect White (FH-128-W)', cat: 'Containers' },
+  { name: 'SL-788 (2.25lb Foil HD)', cat: 'Foil Pans' },
+  { name: 'SL-768 (1.5lb Foil HD)', cat: 'Foil Pans' },
+  { name: 'SL-705 (1lb Foil HD)', cat: 'Foil Pans' },
+  { name: '4oz Sauce Cup', cat: 'Sauce Cups' },
+  { name: '2oz Sauce Cup', cat: 'Sauce Cups' },
+  { name: '1oz Sauce Cup', cat: 'Sauce Cups' },
+  { name: 'Fork', cat: 'Utensils' },
+  { name: 'Spoon', cat: 'Utensils' },
+  { name: '8oz Soup Cup', cat: 'Soup Cups' },
+  { name: '12oz Soup Cup', cat: 'Soup Cups' },
+  { name: '16oz Soup Cup', cat: 'Soup Cups' },
+  { name: '24oz Soup Cup', cat: 'Soup Cups' },
+  { name: '32oz Soup Cup', cat: 'Soup Cups' },
+  { name: '32oz Rect Black (FH-132-B)', cat: 'Containers' },
+  { name: '36oz Noodle Bowl (36ND)', cat: 'Bowls' },
+  { name: '32oz Salad Bowl (32bow)', cat: 'Bowls' },
+  { name: '24oz Bowl (24bow)', cat: 'Bowls' },
+  { name: 'C53 Container', cat: 'Containers' },
+  { name: '8oz Rice Box', cat: 'Rice Boxes' },
+  { name: '16oz Rice Box', cat: 'Rice Boxes' },
+  { name: '26oz Rice Box (FP only)', cat: 'Rice Boxes' },
+  { name: '32oz Rice Box', cat: 'Rice Boxes' },
+  { name: '28oz Rect Black (FH-128-B)', cat: 'Containers' },
+  { name: 'Bag S (Small Handle)', cat: 'Bags' },
+  // --- Below: items not on shelf but BOS may carry ---
+  { name: '4lb Brown Bag', cat: 'Other' },
+  { name: '6x3x5 Plastic Bag', cat: 'Other' },
+  { name: 'TY48 Party Tray', cat: 'Other' },
+  { name: '3.25oz Sauce Cup', cat: 'Other' },
+  { name: '12lb Bag', cat: 'Other' },
+];
+
+const CLIENTS = ['SWD', 'KIIN', 'CC', 'COCO', 'KAPOW', 'SD', 'SR'];
+
+// ============================================================
+// STATE
+// ============================================================
+let loadoutQty = {};
+let deliverQty = {};
+let selectedClient = null;
+let customLoadItems = []; // {name, qty} added via "Add New Item"
+let customDropItems = []; // {name, qty} added via "Add New Item" on drop
+
+// Fallback stock counts from physical count 4/18/2026
+// Used when Supabase API is unavailable (e.g. local preview)
+const FALLBACK_STOCK = {
+  '20lb Bag': 5, 'Bag L (Large Handle)': 3, 'Bag M (Medium Handle)': 3,
+  '#1 Paper Box': 2, '1/8 Paper Bag': 2, '28oz Rect White (FH-128-W)': 8,
+  'SL-788 (2.25lb Foil HD)': 1, 'SL-768 (1.5lb Foil HD)': 2,
+  'SL-705 (1lb Foil HD)': 4, '4oz Sauce Cup': 2, '2oz Sauce Cup': 0,
+  '1oz Sauce Cup': 1, 'Fork': 1, 'Spoon': 1, '8oz Soup Cup': 10,
+  '12oz Soup Cup': 4, '16oz Soup Cup': 1, '24oz Soup Cup': 0,
+  '32oz Soup Cup': 0, '32oz Rect Black (FH-132-B)': 5,
+  '36oz Noodle Bowl (36ND)': 3, '32oz Salad Bowl (32bow)': 1,
+  '24oz Bowl (24bow)': 0, 'C53 Container': 2, '8oz Rice Box': 5,
+  '16oz Rice Box': 0, '26oz Rice Box (FP only)': 0, '32oz Rice Box': 2,
+  '28oz Rect Black (FH-128-B)': 11, 'Bag S (Small Handle)': 36
+};
+
+// ============================================================
+// SUPABASE HELPERS
+// ============================================================
+async function sbFetch(path, options = {}) {
+  const url = `${SUPABASE_URL}/rest/v1/${path}`;
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': options.prefer || 'return=representation'
+  };
+  const res = await fetch(url, { ...options, headers: { ...headers, ...options.headers } });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Supabase error: ${res.status} - ${err}`);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function insertMovements(rows) {
+  return sbFetch('inventory_movements', {
+    method: 'POST',
+    body: JSON.stringify(rows)
+  });
+}
+
+async function getCarInventory() {
+  const data = await sbFetch('inventory_movements?select=type,item_name,qty,from_location,to_location&order=created_at.desc&limit=5000');
+  const car = {};
+  data.forEach(m => {
+    if (!car[m.item_name]) car[m.item_name] = 0;
+    if (m.type === 'load_out' && m.to_location === 'car') car[m.item_name] += m.qty;
+    if (m.type === 'deliver' && m.from_location === 'car') car[m.item_name] -= m.qty;
+    if (m.type === 'return' && m.from_location === 'car') car[m.item_name] -= m.qty;
+  });
+  const result = {};
+  for (const [k, v] of Object.entries(car)) {
+    if (v > 0) result[k] = v;
+  }
+  return result;
+}
+
+async function getGarageInventory() {
+  // Garage = last recount qty - load_outs from garage + returns to garage
+  // For each item: find latest recount, then apply movements after that recount
+  const data = await sbFetch('inventory_movements?select=type,item_name,qty,from_location,to_location,created_at&order=created_at.asc&limit=10000');
+  const garage = {};
+  const lastRecount = {}; // track timestamp of last recount per item
+
+  // First pass: find latest recount for each item
+  data.forEach(m => {
+    if (m.type === 'recount') {
+      lastRecount[m.item_name] = m.created_at;
+      garage[m.item_name] = m.qty;
+    }
+  });
+
+  // Second pass: apply movements AFTER each item's last recount
+  data.forEach(m => {
+    if (m.type === 'recount') return;
+    const recountTime = lastRecount[m.item_name];
+    if (recountTime && m.created_at <= recountTime) return; // before recount, skip
+
+    if (!garage[m.item_name]) garage[m.item_name] = 0;
+
+    if (m.type === 'load_out' && m.from_location === 'garage') {
+      garage[m.item_name] -= m.qty;
+    }
+    if (m.type === 'return' && m.to_location === 'garage') {
+      garage[m.item_name] += m.qty;
+    }
+    // 'deliver' doesn't directly affect garage (it affects car)
+  });
+
+  return garage;
+}
+
+async function getRecentDeliveries() {
+  return sbFetch('inventory_movements?type=eq.deliver&order=created_at.desc&limit=50');
+}
+
+async function getTodayLoadouts() {
+  const today = new Date().toISOString().split('T')[0];
+  return sbFetch(`inventory_movements?type=eq.load_out&created_at=gte.${today}T00:00:00&order=created_at.desc`);
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function $(id) { return document.getElementById(id); }
+function showToast(msg, type = '') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+function buildItemRows(containerId, qtyObj, shelfOrderOnly) {
+  const container = $(containerId);
+  container.innerHTML = '';
+  // Show items in shelf order (no category grouping — shelf order IS the grouping)
+  const shelfItems = shelfOrderOnly ? PRODUCTS.filter(p => p.cat !== 'Other') : PRODUCTS;
+  const otherItems = shelfOrderOnly ? [] : PRODUCTS.filter(p => p.cat === 'Other');
+
+  // Shelf items — numbered to match physical shelf position
+  shelfItems.forEach((p, idx) => {
+    if (p.cat === 'Other') return;
+    const row = createItemRow(p, qtyObj);
+    container.appendChild(row);
+  });
+
+  // Other items (expandable)
+  if (!shelfOrderOnly && otherItems.length > 0) {
+    const divider = document.createElement('div');
+    divider.className = 'cat-label';
+    divider.textContent = 'OTHER ITEMS';
+    divider.style.cursor = 'pointer';
+    divider.style.color = 'var(--accent)';
+    container.appendChild(divider);
+
+    const otherDiv = document.createElement('div');
+    otherDiv.id = containerId + '_other';
+    otherItems.forEach(p => {
+      const row = createItemRow(p, qtyObj);
+      otherDiv.appendChild(row);
+    });
+    container.appendChild(otherDiv);
+  }
+}
+
+function createItemRow(product, qtyObj) {
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'item-name';
+  const garageQty = (window._garageStock && window._garageStock[product.name]) || 0;
+  const stockColor = garageQty <= 0 ? 'var(--red)' : garageQty <= 2 ? 'var(--orange)' : 'var(--green)';
+  const stockLabel = garageQty <= 0 ? 'OUT' : garageQty;
+  nameSpan.innerHTML = `${product.name} <span style="font-size:11px;font-weight:700;color:${stockColor}">[${stockLabel}]</span>`;
+  const controls = document.createElement('div');
+  controls.className = 'qty-controls';
+  const minusBtn = document.createElement('button');
+  minusBtn.className = 'qty-btn';
+  minusBtn.textContent = '-';
+  const valSpan = document.createElement('span');
+  valSpan.className = 'qty-val';
+  valSpan.textContent = qtyObj[product.name] || 0;
+  if (qtyObj[product.name]) valSpan.classList.add('has-val');
+  const plusBtn = document.createElement('button');
+  plusBtn.className = 'qty-btn';
+  plusBtn.textContent = '+';
+  minusBtn.addEventListener('click', () => {
+    const cur = qtyObj[product.name] || 0;
+    if (cur > 0) {
+      qtyObj[product.name] = cur - 1;
+      valSpan.textContent = qtyObj[product.name];
+      valSpan.classList.toggle('has-val', qtyObj[product.name] > 0);
+    }
+  });
+  plusBtn.addEventListener('click', () => {
+    qtyObj[product.name] = (qtyObj[product.name] || 0) + 1;
+    valSpan.textContent = qtyObj[product.name];
+    valSpan.classList.add('has-val');
+  });
+  controls.appendChild(minusBtn);
+  controls.appendChild(valSpan);
+  controls.appendChild(plusBtn);
+  row.appendChild(nameSpan);
+  row.appendChild(controls);
+  return row;
+}
+
+function getSelectedItems(qtyObj) {
+  return Object.entries(qtyObj).filter(([_, q]) => q > 0).map(([name, qty]) => ({ name, qty }));
+}
+
+function showOverlay(title, items, onConfirm) {
+  $('overlayTitle').textContent = title;
+  const summary = $('overlaySummary');
+  summary.innerHTML = '';
+  let totalCases = 0;
+  items.forEach(i => {
+    totalCases += i.qty;
+    const row = document.createElement('div');
+    row.className = 'summary-row';
+    row.innerHTML = `<span>${i.name}</span><span style="font-weight:700">x${i.qty}</span>`;
+    summary.appendChild(row);
+  });
+  // Total row
+  const totalRow = document.createElement('div');
+  totalRow.className = 'summary-row';
+  totalRow.style.cssText = 'font-weight:700;border-top:2px solid var(--navy);margin-top:8px;padding-top:8px';
+  totalRow.innerHTML = `<span>TOTAL</span><span>${totalCases} cases</span>`;
+  summary.appendChild(totalRow);
+
+  $('confirmOverlay').classList.add('show');
+  $('overlayConfirm').onclick = () => {
+    $('confirmOverlay').classList.remove('show');
+    onConfirm();
+  };
+  $('overlayCancel').onclick = () => {
+    $('confirmOverlay').classList.remove('show');
+  };
+}
+
+function formatTime(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const isToday = d.toDateString() === now.toDateString();
+  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  if (isToday) return `Today ${time}`;
+  const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+  if (d.toDateString() === yesterday.toDateString()) return `Yesterday ${time}`;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + time;
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+$('passInput').addEventListener('input', function() {
+  $('loginError').textContent = '';
+  if (this.value.length === 4) {
+    if (this.value === MANAGER_PIN) {
+      $('loginScreen').style.display = 'none';
+      $('mainApp').style.display = 'block';
+      initApp();
+    } else {
+      $('loginError').textContent = 'Wrong PIN';
+      this.value = '';
+    }
+  }
+});
+
+$('logoutBtn').addEventListener('click', () => {
+  $('mainApp').style.display = 'none';
+  $('loginScreen').style.display = 'flex';
+  $('passInput').value = '';
+  $('passInput').focus();
+});
+
+// HELP
+$('helpBtn').addEventListener('click', () => $('helpOverlay').classList.add('show'));
+$('helpClose').addEventListener('click', () => $('helpOverlay').classList.remove('show'));
+
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    $('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'dashboard') refreshDashboard();
+  });
+});
+
+// ============================================================
+// INIT
+// ============================================================
+async function initApp() {
+  $('headerDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  loadoutQty = {};
+  // Fetch garage stock so we can show counts next to each item
+  try {
+    window._garageStock = await getGarageInventory();
+  } catch(e) {
+    window._garageStock = FALLBACK_STOCK;
+  }
+  buildItemRows('loadoutItems', loadoutQty, false);
+  buildClientGrid();
+}
+
+// ============================================================
+// LOAD OUT
+// ============================================================
+$('confirmLoadBtn').addEventListener('click', () => {
+  const items = getSelectedItems(loadoutQty);
+  if (items.length === 0) {
+    showToast('Select items first', 'error');
+    return;
+  }
+  showOverlay('Confirm Load Out', items, async () => {
+    try {
+      $('confirmLoadBtn').innerHTML = '<span class="spinner"></span>Saving...';
+      $('confirmLoadBtn').disabled = true;
+      const rows = items.map(i => ({
+        type: 'load_out',
+        item_name: i.name,
+        qty: i.qty,
+        from_location: 'garage',
+        to_location: 'car',
+        notes: `Loaded ${new Date().toLocaleDateString()}`
+      }));
+      await insertMovements(rows);
+      showToast(`${items.reduce((s,i)=>s+i.qty,0)} cases loaded`, 'success');
+      loadoutQty = {};
+      customLoadItems = [];
+      renderCustomItems('customItemsList', customLoadItems);
+      buildItemRows('loadoutItems', loadoutQty, false);
+    } catch (e) {
+      console.error(e);
+      showToast('Error saving - check connection', 'error');
+    } finally {
+      $('confirmLoadBtn').innerHTML = 'Confirm Load Out';
+      $('confirmLoadBtn').disabled = false;
+    }
+  });
+});
+
+// ============================================================
+// CONFIRM DROP
+// ============================================================
+function buildClientGrid() {
+  const grid = $('clientGrid');
+  grid.innerHTML = '';
+  CLIENTS.forEach(c => {
+    const chip = document.createElement('div');
+    chip.className = 'client-chip';
+    chip.textContent = c;
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.client-chip').forEach(ch => ch.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedClient = c;
+      $('deliverClient').textContent = c;
+      $('deliverItemsCard').style.display = 'block';
+      $('addDropItemCard').style.display = 'block';
+      $('confirmDropBtn').style.display = 'block';
+      deliverQty = {};
+      customDropItems = [];
+      renderCustomItems('customDropItemsList', customDropItems);
+      buildDeliverItemsFromCar();
+    });
+    grid.appendChild(chip);
+  });
+}
+
+async function buildDeliverItemsFromCar() {
+  try {
+    const carStock = await getCarInventory();
+    const container = $('deliverItems');
+    container.innerHTML = '';
+    deliverQty = {};
+
+    const inCar = PRODUCTS.filter(p => carStock[p.name] && carStock[p.name] > 0);
+    const notInCar = PRODUCTS.filter(p => !carStock[p.name] || carStock[p.name] <= 0);
+
+    if (inCar.length > 0) {
+      const label = document.createElement('div');
+      label.className = 'cat-label';
+      label.style.cssText = 'color:var(--green);border-top:none';
+      label.textContent = `IN CAR (${inCar.length} items)`;
+      container.appendChild(label);
+
+      inCar.forEach(p => {
+        const row = createDeliverRow(p, carStock[p.name]);
+        container.appendChild(row);
+      });
+    }
+
+    if (notInCar.length > 0) {
+      const label2 = document.createElement('div');
+      label2.className = 'cat-label';
+      label2.textContent = 'OTHER ITEMS';
+      label2.style.cursor = 'pointer';
+      label2.style.color = 'var(--accent)';
+      container.appendChild(label2);
+
+      const otherDiv = document.createElement('div');
+      notInCar.forEach(p => {
+        const row = createDeliverRow(p, 0);
+        otherDiv.appendChild(row);
+      });
+      container.appendChild(otherDiv);
+    }
+  } catch (e) {
+    console.error(e);
+    deliverQty = {};
+    buildItemRows('deliverItems', deliverQty, false);
+  }
+}
+
+function createDeliverRow(product, carQty) {
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'item-name';
+  nameSpan.innerHTML = product.name + (carQty > 0 ? ` <span style="font-size:11px;color:var(--accent)">(${carQty} in car)</span>` : '');
+  const controls = document.createElement('div');
+  controls.className = 'qty-controls';
+  const minusBtn = document.createElement('button');
+  minusBtn.className = 'qty-btn';
+  minusBtn.textContent = '-';
+  const valSpan = document.createElement('span');
+  valSpan.className = 'qty-val';
+  valSpan.textContent = '0';
+  const plusBtn = document.createElement('button');
+  plusBtn.className = 'qty-btn';
+  plusBtn.textContent = '+';
+  minusBtn.addEventListener('click', () => {
+    const cur = deliverQty[product.name] || 0;
+    if (cur > 0) {
+      deliverQty[product.name] = cur - 1;
+      valSpan.textContent = deliverQty[product.name];
+      valSpan.classList.toggle('has-val', deliverQty[product.name] > 0);
+    }
+  });
+  plusBtn.addEventListener('click', () => {
+    deliverQty[product.name] = (deliverQty[product.name] || 0) + 1;
+    valSpan.textContent = deliverQty[product.name];
+    valSpan.classList.add('has-val');
+  });
+  controls.appendChild(minusBtn);
+  controls.appendChild(valSpan);
+  controls.appendChild(plusBtn);
+  row.appendChild(nameSpan);
+  row.appendChild(controls);
+  return row;
+}
+
+$('confirmDropBtn').addEventListener('click', () => {
+  const items = getSelectedItems(deliverQty);
+  if (!selectedClient) {
+    showToast('Select a client first', 'error');
+    return;
+  }
+  if (items.length === 0) {
+    showToast('Select items first', 'error');
+    return;
+  }
+  showOverlay(`Drop to ${selectedClient}`, items, async () => {
+    try {
+      $('confirmDropBtn').innerHTML = '<span class="spinner"></span>Saving...';
+      $('confirmDropBtn').disabled = true;
+      const rows = items.map(i => ({
+        type: 'deliver',
+        item_name: i.name,
+        qty: i.qty,
+        from_location: 'car',
+        to_location: 'client',
+        client: selectedClient,
+        notes: `Delivered to ${selectedClient} on ${new Date().toLocaleDateString()}`
+      }));
+      await insertMovements(rows);
+      showToast(`${items.reduce((s,i)=>s+i.qty,0)} cases to ${selectedClient}`, 'success');
+      deliverQty = {};
+      customDropItems = [];
+      selectedClient = null;
+      document.querySelectorAll('.client-chip').forEach(ch => ch.classList.remove('selected'));
+      $('deliverItemsCard').style.display = 'none';
+      $('addDropItemCard').style.display = 'none';
+      $('confirmDropBtn').style.display = 'none';
+    } catch (e) {
+      console.error(e);
+      showToast('Error saving - check connection', 'error');
+    } finally {
+      $('confirmDropBtn').innerHTML = 'Confirm Drop';
+      $('confirmDropBtn').disabled = false;
+    }
+  });
+});
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function refreshDashboard() {
+  // Garage stock first
+  await refreshGarageStock();
+
+  // Car inventory
+  try {
+    const carStock = await getCarInventory();
+    const carDiv = $('carStock');
+    const entries = Object.entries(carStock).sort((a, b) => b[1] - a[1]);
+    if (entries.length === 0) {
+      carDiv.innerHTML = '<div class="empty-state"><div class="icon">OK</div><p>Car is empty</p></div>';
+    } else {
+      carDiv.innerHTML = entries.map(([name, qty]) => {
+        const cls = qty <= 1 ? 'car-item low' : 'car-item';
+        return `<div class="${cls}"><span>${name}</span><span class="item-qty">${qty}</span></div>`;
+      }).join('');
+    }
+  } catch (e) {
+    $('carStock').innerHTML = '<div class="empty-state"><p>Could not load</p></div>';
+  }
+
+  try {
+    const deliveries = await getRecentDeliveries();
+    const delDiv = $('recentDeliveries');
+    if (!deliveries || deliveries.length === 0) {
+      delDiv.innerHTML = '<div class="empty-state"><p>No deliveries yet</p></div>';
+    } else {
+      const groups = [];
+      let current = null;
+      deliveries.forEach(d => {
+        const t = new Date(d.created_at).getTime();
+        if (!current || current.client !== d.client || Math.abs(t - current.time) > 300000) {
+          current = { client: d.client, time: t, created_at: d.created_at, items: [] };
+          groups.push(current);
+        }
+        current.items.push({ name: d.item_name, qty: d.qty });
+      });
+      delDiv.innerHTML = groups.slice(0, 15).map(g => `
+        <div class="delivery-card">
+          <div class="del-header">
+            <span class="del-client">${g.client}</span>
+            <span class="del-time">${formatTime(g.created_at)}</span>
+          </div>
+          <div class="del-items">${g.items.map(i => `${i.name} x${i.qty}`).join(', ')}</div>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    $('recentDeliveries').innerHTML = '<div class="empty-state"><p>Could not load</p></div>';
+  }
+
+  try {
+    const loadouts = await getTodayLoadouts();
+    const loDiv = $('todayLoadouts');
+    if (!loadouts || loadouts.length === 0) {
+      loDiv.innerHTML = '<div class="empty-state"><p>No load outs today</p></div>';
+    } else {
+      const grouped = {};
+      loadouts.forEach(l => {
+        const key = new Date(l.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(`${l.item_name} x${l.qty}`);
+      });
+      loDiv.innerHTML = Object.entries(grouped).map(([time, items]) => `
+        <div class="delivery-card" style="border-left-color:var(--accent)">
+          <div class="del-header">
+            <span class="del-client">Load Out</span>
+            <span class="del-time">${time}</span>
+          </div>
+          <div class="del-items">${items.join(', ')}</div>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    $('todayLoadouts').innerHTML = '<div class="empty-state"><p>Could not load</p></div>';
+  }
+}
+
+$('refreshDash').addEventListener('click', refreshDashboard);
+
+// ============================================================
+// ADD NEW ITEM (Load Out)
+// ============================================================
+$('addNewItemBtn').addEventListener('click', () => {
+  const name = $('newItemName').value.trim();
+  const qty = parseInt($('newItemQty').value) || 1;
+  if (!name) { showToast('Enter item name', 'error'); return; }
+  // Add to custom list and loadoutQty
+  customLoadItems.push({ name, qty });
+  loadoutQty[name] = (loadoutQty[name] || 0) + qty;
+  $('newItemName').value = '';
+  $('newItemQty').value = '1';
+  renderCustomItems('customItemsList', customLoadItems);
+  showToast(`Added ${name} x${qty}`, 'success');
+});
+
+// ADD NEW ITEM (Confirm Drop)
+$('addNewDropItemBtn').addEventListener('click', () => {
+  const name = $('newDropItemName').value.trim();
+  const qty = parseInt($('newDropItemQty').value) || 1;
+  if (!name) { showToast('Enter item name', 'error'); return; }
+  customDropItems.push({ name, qty });
+  deliverQty[name] = (deliverQty[name] || 0) + qty;
+  $('newDropItemName').value = '';
+  $('newDropItemQty').value = '1';
+  renderCustomItems('customDropItemsList', customDropItems);
+  showToast(`Added ${name} x${qty}`, 'success');
+});
+
+function renderCustomItems(containerId, items) {
+  const container = $(containerId);
+  container.innerHTML = '';
+  items.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--gray);border-radius:8px;margin-bottom:4px;font-size:14px';
+    row.innerHTML = `<span>${item.name} <b>x${item.qty}</b></span>`;
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'X';
+    removeBtn.style.cssText = 'background:var(--red);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;font-weight:700;cursor:pointer';
+    removeBtn.addEventListener('click', () => {
+      // Remove from qty tracking
+      const qtyObj = containerId === 'customItemsList' ? loadoutQty : deliverQty;
+      if (qtyObj[item.name]) {
+        qtyObj[item.name] -= item.qty;
+        if (qtyObj[item.name] <= 0) delete qtyObj[item.name];
+      }
+      items.splice(idx, 1);
+      renderCustomItems(containerId, items);
+    });
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+  });
+}
+
+// ============================================================
+// GARAGE STOCK (Dashboard)
+// ============================================================
+async function refreshGarageStock() {
+  try {
+    const garage = await getGarageInventory();
+    const garDiv = $('garageStock');
+    // Show in shelf order (PRODUCTS array order), then any extras
+    const knownNames = PRODUCTS.map(p => p.name);
+    const shelfEntries = [];
+    const extraEntries = [];
+
+    // Shelf-order items
+    PRODUCTS.forEach(p => {
+      const qty = garage[p.name];
+      if (qty !== undefined) {
+        shelfEntries.push([p.name, qty]);
+      }
+    });
+
+    // Items in Supabase not in PRODUCTS list
+    Object.entries(garage).forEach(([name, qty]) => {
+      if (!knownNames.includes(name)) {
+        extraEntries.push([name, qty]);
+      }
+    });
+
+    const allEntries = [...shelfEntries, ...extraEntries];
+
+    if (allEntries.length === 0) {
+      garDiv.innerHTML = '<div class="empty-state"><p>No stock data yet. Do a recount or load items.</p></div>';
+    } else {
+      const totalCases = allEntries.reduce((s, [_, q]) => s + Math.max(0, q), 0);
+      garDiv.innerHTML = `<div style="font-size:13px;color:var(--text-light);margin-bottom:8px;font-weight:600">Total: ${totalCases} cases</div>` +
+        allEntries.map(([name, qty]) => {
+          let cls = 'car-item';
+          let badge = '';
+          if (qty <= 0) { cls = 'car-item empty'; badge = ' <span style="color:var(--red);font-size:11px;font-weight:700">OUT</span>'; }
+          else if (qty <= 2) { cls = 'car-item low'; badge = ' <span style="color:var(--orange);font-size:11px;font-weight:700">LOW</span>'; }
+          return `<div class="${cls}"><span>${name}${badge}</span><span class="item-qty">${qty}</span></div>`;
+        }).join('');
+    }
+  } catch (e) {
+    $('garageStock').innerHTML = '<div class="empty-state"><p>Could not load garage stock</p></div>';
+  }
+}
+
+window.addEventListener('load', () => $('passInput').focus());
+</script>
+</body>
+</html>
