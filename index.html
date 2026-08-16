@@ -343,7 +343,7 @@ font-size:9px;font-weight:700;color:#a89f8c;text-align:center;line-height:1.1}
   <h2 data-i18n="rept">Rep sign-in</h2>
   <div class="roletog">
     <button data-m="rep" class="on" onclick="setRole('rep')">I'm a rep</button>
-    <button data-m="manager" onclick="setRole('manager')">I'm BOS</button>
+    <button data-m="manager" onclick="setRole('manager')">Manager</button>
   </div>
   <label id="repLbl" data-i18n="repl">Last 4 digits of your phone</label>
   <input id="repPin" maxlength="4" inputmode="numeric" placeholder="0000" autocomplete="off">
@@ -959,7 +959,7 @@ function loadRep(d){
   PINS=d.pins||[]; ITEMS=d.items||[]; OFF=d.offsets||{}; ACTS=d.activity||[]; LEADS=d.leads||[];
   REP = d.rep || {name:'BOS'};
   document.getElementById('repapp').classList.toggle('mgr', MODE==='manager');
-  document.getElementById('rname').textContent = MODE==='manager' ? 'BOS · manager' : REP.name;
+  document.getElementById('rname').textContent = MODE==='manager' ? 'Manager' : REP.name;
   document.getElementById('rav').textContent=(REP.name||'?').slice(0,1).toUpperCase();
   document.getElementById('tab_leads').style.display = MODE==='manager' ? '' : 'none';
   document.querySelector('[data-t=work]').textContent = MODE==='manager' ? 'Being worked' : 'Working';
