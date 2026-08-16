@@ -207,6 +207,20 @@ padding:12px 13px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
 .tg.cust{background:var(--ink);color:var(--mus)}
 .tg.held{background:var(--mus)}
 .empty{padding:34px 16px;text-align:center;color:#5c564d;font-weight:700}
+
+.mgr .rhead{background:var(--red)}
+.mgr .rwho .av{background:var(--ink);color:var(--mus)}
+.leadrow{background:var(--paper);border:4px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:12px 13px}
+.leadrow h4{font-family:"Arial Black",sans-serif;font-size:15px;text-transform:uppercase}
+.leadrow .m{font-size:13px;color:#5c564d;margin-top:4px}
+.leadrow a{color:var(--red);font-weight:700}
+.mgrbox{border:4px solid var(--ink);background:var(--mus);padding:12px;margin-bottom:14px}
+.mgrbox label{display:block;font-weight:700;font-size:12px;text-transform:uppercase;margin-bottom:5px}
+.mgrbox input{width:100%;border:3px solid var(--ink);padding:9px;font:inherit;font-size:15px;background:var(--paper)}
+.roletog{display:flex;gap:8px;margin-top:12px}
+.roletog button{flex:1;border:3px solid var(--ink);background:var(--paper);padding:8px;font:inherit;
+font-weight:700;font-size:13px;cursor:pointer}
+.roletog button.on{background:var(--ink);color:var(--cream)}
 /* pin detail */
 #pin{position:fixed;inset:0;z-index:75;background:rgba(28,26,23,.86);display:none;overflow:auto;padding:18px}
 #pin.on{display:block}
@@ -275,7 +289,11 @@ background:var(--ink);color:var(--cream);padding:6px 9px;margin:14px 0 0}
 
 <div id="rep"><div class="rbox">
   <h2 data-i18n="rept">Rep sign-in</h2>
-  <label data-i18n="repl">Last 4 digits of your phone</label>
+  <div class="roletog">
+    <button data-m="rep" class="on" onclick="setRole('rep')">I'm a rep</button>
+    <button data-m="manager" onclick="setRole('manager')">I'm BOS</button>
+  </div>
+  <label id="repLbl" data-i18n="repl">Last 4 digits of your phone</label>
   <input id="repPin" maxlength="4" inputmode="numeric" placeholder="0000" autocomplete="off">
   <div class="nt" style="display:none"></div>
   <button id="repBtn" style="margin-top:16px;width:100%;border:4px solid var(--ink);padding:13px;font-weight:700;cursor:pointer;background:var(--teal);color:#fff;font-family:inherit;font-size:16px" onclick="repGo()">Sign in</button>
@@ -298,6 +316,7 @@ background:var(--ink);color:var(--cream);padding:6px 9px;margin:14px 0 0}
     <button class="rtab" data-t="open">Open pins</button>
     <button class="rtab" data-t="won">Closed</button>
     <button class="rtab" data-t="act">Activity</button>
+    <button class="rtab" data-t="leads" id="tab_leads" style="display:none">Leads</button>
   </div>
   <div class="rbar">
     <input id="rq" placeholder="Search name or town…">
@@ -827,6 +846,15 @@ document.getElementById('f_send').addEventListener('click', function(){
    into a bulk download of prospects or prices by lifting the anon key. */
 var API='https://agbxkuaedwallthbpphe.supabase.co/functions/v1/salesmap';
 var REP=null, PINS=[], ITEMS=[], OFF={}, ACTS=[], TAB='work', MYLOC=null, MAP=null, LAYER=null, LAST4='';
+var MODE='rep', LEADS=[], MPIN='';
+var SKEY='bos_sess_v1', SMAXH=12;
+function saveSess(){ try{ localStorage.setItem(SKEY, JSON.stringify(
+  {mode:MODE, code: MODE==='manager'?MPIN:LAST4, ts:Date.now()})); }catch(e){} }
+function clearSess(){ try{ localStorage.removeItem(SKEY); }catch(e){} }
+function readSess(){ try{ var s=JSON.parse(localStorage.getItem(SKEY)||'null');
+  if(!s||!s.code) return null;
+  if(Date.now()-s.ts > SMAXH*3600*1000){ clearSess(); return null; }
+  return s; }catch(e){ return null; } }
 
 function repErr(m){ var n=document.querySelector('#rep .nt'); n.textContent=m; n.style.display='block'; }
 
@@ -838,29 +866,58 @@ async function repApi(payload){
   return d;
 }
 function loadRep(d){
-  REP=d.rep; PINS=d.pins||[]; ITEMS=d.items||[]; OFF=d.offsets||{}; ACTS=d.activity||[];
-  document.getElementById('rname').textContent=REP.name;
+  PINS=d.pins||[]; ITEMS=d.items||[]; OFF=d.offsets||{}; ACTS=d.activity||[]; LEADS=d.leads||[];
+  REP = d.rep || {name:'BOS'};
+  document.getElementById('repapp').classList.toggle('mgr', MODE==='manager');
+  document.getElementById('rname').textContent = MODE==='manager' ? 'BOS · manager' : REP.name;
   document.getElementById('rav').textContent=(REP.name||'?').slice(0,1).toUpperCase();
+  document.getElementById('tab_leads').style.display = MODE==='manager' ? '' : 'none';
+  document.querySelector('[data-t=work]').textContent = MODE==='manager' ? 'Being worked' : 'Working';
+  saveSess();
   document.getElementById('rep').classList.remove('on');
   document.getElementById('repapp').classList.add('on');
   render();
 }
+function setRole(m){
+  MODE=m;
+  document.querySelectorAll('.roletog button').forEach(function(b){ b.classList.toggle('on', b.dataset.m===m); });
+  document.getElementById('repLbl').textContent = m==='manager' ? 'Manager code' : 'Last 4 digits of your phone';
+}
 async function repGo(){
   var el=document.getElementById('repPin'), code=(el.value||'').trim();
   var btn=document.getElementById('repBtn');
-  if(!/^\d{4}$/.test(code)){ repErr('Enter the last 4 digits of your phone.'); return; }
+  if(!/^\d{4}$/.test(code)){ repErr(MODE==='manager'?'Enter your manager code.':'Enter the last 4 digits of your phone.'); return; }
   btn.disabled=true; btn.textContent='Checking…';
-  try{ var d=await repApi({action:'rep_login',last4:code}); LAST4=code; loadRep(d); }
-  catch(e){ repErr(e.message); }
+  try{
+    var d = MODE==='manager'
+      ? await repApi({action:'manager_login',pin:code})
+      : await repApi({action:'rep_login',last4:code});
+    if(MODE==='manager') MPIN=code; else LAST4=code;
+    loadRep(d);
+  }catch(e){ repErr(e.message); }
   finally{ btn.disabled=false; btn.textContent='Sign in'; }
 }
+/* Re-open the same session after a refresh. BOS: "the results must stay even
+   after I refresh the page." Cleared by Sign out, and expires after 12 hours. */
+async function resume(){
+  var s=readSess(); if(!s) return;
+  MODE=s.mode;
+  try{
+    var d = MODE==='manager'
+      ? await repApi({action:'manager_login',pin:s.code})
+      : await repApi({action:'rep_login',last4:s.code});
+    if(MODE==='manager') MPIN=s.code; else LAST4=s.code;
+    document.getElementById('doors').classList.add('gone');
+    loadRep(d);
+  }catch(e){ clearSess(); }
+}
 function repOut(){
-  REP=null; LAST4=''; PINS=[];
+  REP=null; LAST4=''; MPIN=''; PINS=[]; LEADS=[]; clearSess();
   document.getElementById('repapp').classList.remove('on');
   document.getElementById('repPin').value='';
   var n=document.querySelector('#rep .nt'); n.style.display='none';
 }
-function mine(p){ return REP && p.claimed_by===REP.name; }
+function mine(p){ return MODE==='rep' && REP && p.claimed_by===REP.name; }
 function dist(a,b,c,d){ var R=3959,t=Math.PI/180,dLat=(c-a)*t,dLon=(d-b)*t;
   var x=Math.sin(dLat/2)**2+Math.cos(a*t)*Math.cos(c*t)*Math.sin(dLon/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)); }
@@ -869,8 +926,8 @@ function subset(){
   var q=(document.getElementById('rq').value||'').toLowerCase().trim();
   var tf=document.getElementById('rtier').value;
   var out=PINS.filter(function(p){
-    if(TAB==='work')  return mine(p);
-    if(TAB==='won')   return REP && p.won_by===REP.name;
+    if(TAB==='work')  return MODE==='manager' ? p.status==='YELLOW' : mine(p);
+    if(TAB==='won')   return MODE==='manager' ? !!p.client_code : (REP && p.won_by===REP.name);
     if(TAB==='open')  return !p.client_code && p.status==='GREEN';
     return false;
   });
@@ -885,14 +942,26 @@ function days(iso){ if(!iso) return ''; var d=Math.floor((Date.now()-new Date(is
   return d<=0?'today':(d+' day'+(d===1?'':'s')); }
 
 function render(){
-  var work=PINS.filter(mine).length;
+  var work=MODE==='manager'?PINS.filter(function(p){return p.status==='YELLOW';}).length:PINS.filter(mine).length;
   var open=PINS.filter(function(p){return !p.client_code&&p.status==='GREEN';}).length;
-  var won=PINS.filter(function(p){return REP&&p.won_by===REP.name;}).length;
+  var won=MODE==='manager'?PINS.filter(function(p){return !!p.client_code;}).length
+        :PINS.filter(function(p){return REP&&p.won_by===REP.name;}).length;
   document.getElementById('st_work').textContent=work;
   document.getElementById('st_open').textContent=open;
   document.getElementById('st_won').textContent=won;
 
   var box=document.getElementById('rlist');
+  if(TAB==='leads'){
+    box.innerHTML = LEADS.length ? LEADS.map(function(l){
+      var c=(l.contact||''); var href=c.indexOf('@')>0?('mailto:'+c):('tel:'+c.replace(/[^0-9+]/g,''));
+      return '<div class="leadrow"><h4>'+((l.restaurant||l.name||'Lead')+'')+'</h4>'+
+        '<div class="m"><a href="'+href+'">'+c+'</a> · '+(l.contact_kind||'')+' · '+days(l.created_at)+' ago</div>'+
+        (l.name?'<div class="m">'+l.name+'</div>':'')+
+        (l.items_viewed?'<div class="m"><b>Marked:</b> '+l.items_viewed+'</div>':'')+
+        (l.message?'<div class="m"><b>Note:</b> '+l.message+'</div>':'')+'</div>';
+    }).join('') : '<div class="empty">No leads yet. They land here the moment someone uses the menu form.</div>';
+    return;
+  }
   if(TAB==='act'){
     box.innerHTML = ACTS.length ? ACTS.map(function(a){
       var p=PINS.filter(function(x){return x.id===a.prospect_id;})[0];
@@ -973,6 +1042,19 @@ function openPin(id){
   if(p.client_code){
     note.textContent='Already a BOS customer ('+p.client_code+'). Do not pitch, do not price — what they pay is settled.';
     note.style.display='block'; sheet.innerHTML='';
+    if(MODE==='manager'){
+      acts.innerHTML='<button class="pact rel" data-set="GREEN">Reopen as prospect</button>';
+    }
+    document.getElementById('pin').classList.add('on'); return;
+  }
+  if(MODE==='manager'){
+    sheet.innerHTML='';
+    acts.innerHTML='<div class="mgrbox" style="width:100%"><label>Close this pin — client code</label>'+
+      '<input id="mgr_code" placeholder="e.g. KIIN" autocomplete="off"></div>'+
+      '<button class="pact claim" data-set="RED">Mark RED (won)</button>';
+    if(p.status!=='GREEN') acts.innerHTML+='<button class="pact rel" data-set="GREEN">Back to open</button>';
+    var off0=OFF[p.tier]||0;
+    sheet.innerHTML='<h5>Tier '+p.tier+' — a rep would quote master + '+off0+'</h5>';
     document.getElementById('pin').classList.add('on'); return;
   }
   if(p.status==='RED'){
@@ -999,13 +1081,27 @@ function closePin(){ document.getElementById('pin').classList.remove('on'); }
 document.getElementById('pin_acts').addEventListener('click',function(e){
   var b=e.target.closest('[data-set]'); if(b) setPin(b.dataset.set);
 });
+resume();
 async function setPin(status){
   if(!CUR) return;
   var btns=document.querySelectorAll('#pin_acts .pact');
   btns.forEach(function(b){ b.disabled=true; b.textContent='Saving…'; });
   try{
-    var d=await repApi({action:'rep_status',last4:LAST4,id:CUR.id,status:status});
-    PINS=d.pins||PINS; ACTS=d.activity||ACTS;
+    var d;
+    if(MODE==='manager'){
+      var codeEl=document.getElementById('mgr_code');
+      var payload={action:'manager_set',pin:MPIN,id:CUR.id,status:status};
+      if(status==='RED'){
+        var cc=(codeEl&&codeEl.value||'').trim();
+        if(!cc){ throw new Error('A closed pin needs its client code — that is the link to the account.'); }
+        payload.client_code=cc;
+        if(CUR.claimed_by) payload.won_by=CUR.claimed_by;
+      }
+      d=await repApi(payload);
+    } else {
+      d=await repApi({action:'rep_status',last4:LAST4,id:CUR.id,status:status});
+    }
+    PINS=d.pins||PINS; ACTS=d.activity||ACTS; LEADS=d.leads||LEADS;
     closePin(); render();
   }catch(e){
     var n=document.getElementById('pin_note'); n.textContent=e.message; n.style.display='block';
