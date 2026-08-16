@@ -263,6 +263,39 @@ font-size:9px;font-weight:700;color:#a89f8c;text-align:center;line-height:1.1}
 .guardnote{background:var(--red);color:#fff;padding:8px 10px;font-size:12.5px;font-weight:700;margin-top:2px}
 .ptab td.pqty{text-align:right;color:#8a8377;font-size:12px;white-space:nowrap}
 .pfoot{background:var(--ink);color:var(--cream);padding:11px 18px;font-size:12.5px;font-weight:600}
+/* ---- phone ---- BOS: "on phone view is look a little annoying" ---- */
+@media(max-width:560px){
+  .rhead{padding:8px 12px}
+  .rhead img{height:22px}
+  .rwho{font-size:14px} .rwho .av{width:26px;height:26px;font-size:12px}
+  .rhead .hb{padding:7px 10px;font-size:12px}
+  #rmap{height:38vh;min-height:210px}
+  .rbar{padding:10px 12px;gap:7px}
+  .rbar input,.rbar select{padding:10px;font-size:16px}   /* 16px stops iOS zooming in */
+  .rbar .mini{padding:10px 11px;font-size:12px}
+  .searchwrap{flex:1 1 100%;min-width:0}
+  .rbar select{flex:1 1 46%}
+  .sugg{max-height:46vh}
+  .sugg button{padding:11px}
+  .rstat{padding:11px 10px}
+  .rstat b{font-size:24px}
+  .rstat span{font-size:10.5px}
+  .rtab{padding:10px 13px;font-size:13px}
+  .plist{padding:0 12px 90px;gap:9px}
+  .prow{padding:11px;box-shadow:4px 4px 0 var(--ink)}
+  .prow h4{font-size:14px}
+  #pin{padding:0}
+  .pcard{border-width:0;border-top:5px solid var(--ink);box-shadow:none;margin-bottom:0;min-height:100%}
+  .ptop{position:sticky;top:0;z-index:3;padding:13px 14px}
+  .ptop h3{font-size:18px}
+  .pbody{padding:13px 14px}
+  .ptab td{padding:6px 5px;font-size:13px}
+  .ptab td.pic{width:42px;padding:4px 2px 4px 5px}
+  .ptab td.pic img,.ptab td.pic .nopic{width:36px;height:36px}
+  .ptab td.pqty{display:none}          /* pack size is noise on a small screen */
+  .pact{flex:1 1 100%;text-align:center}
+}
+
 .mt{position:fixed;left:0;bottom:0;z-index:80;background:var(--ink);color:var(--mus);padding:5px 10px;font:10px/1 monospace;letter-spacing:.1em}
 </style></head><body>
 
@@ -886,6 +919,25 @@ function photoFor(name){
   return PHOTO[nrm(base)]||null;
 }
 var SKEY='bos_sess_v1', SMAXH=12;
+/* Sign out after a spell of doing nothing. A rep's phone shows prices, and a
+   phone gets left in a van. The 12-hour cap stays as a hard ceiling; this is the
+   idle cut-off on top of it. Any tap, key, scroll or touch resets it. */
+var IDLE_MIN=30, lastTouch=0, idleTimer=null;
+function touch(){ lastTouch=Date.now(); }
+['click','keydown','scroll','touchstart','mousemove'].forEach(function(ev){
+  document.addEventListener(ev, touch, {passive:true});
+});
+function startIdleWatch(){
+  if(idleTimer) clearInterval(idleTimer);
+  touch();
+  idleTimer=setInterval(function(){
+    if(!REP) return;
+    if(Date.now()-lastTouch > IDLE_MIN*60*1000){
+      clearInterval(idleTimer); idleTimer=null;
+      repOut(true);
+    }
+  }, 20000);
+}
 function saveSess(){ try{ localStorage.setItem(SKEY, JSON.stringify(
   {mode:MODE, code: MODE==='manager'?MPIN:LAST4, ts:Date.now()})); }catch(e){} }
 function clearSess(){ try{ localStorage.removeItem(SKEY); }catch(e){} }
@@ -912,6 +964,7 @@ function loadRep(d){
   document.getElementById('tab_leads').style.display = MODE==='manager' ? '' : 'none';
   document.querySelector('[data-t=work]').textContent = MODE==='manager' ? 'Being worked' : 'Working';
   saveSess();
+  startIdleWatch();
   buildPhotos();
   /* BOS: "when log in into rep, map should be the first thing that show up."
      Open the map immediately, and land on a tab that actually HAS pins - a rep
@@ -920,8 +973,8 @@ function loadRep(d){
   TAB = hasWork ? 'work' : 'open';   /* never open onto an empty board */
   document.querySelectorAll('.rtab').forEach(function(x){ x.classList.toggle('on', x.dataset.t===TAB); });
   document.getElementById('rmap').classList.add('on');
-  fillSuggest();
   setTimeout(function(){ initMap(); render(); }, 60);
+  touch();
   document.getElementById('rep').classList.remove('on');
   document.getElementById('repapp').classList.add('on');
   render();
@@ -959,11 +1012,17 @@ async function resume(){
     loadRep(d);
   }catch(e){ clearSess(); }
 }
-function repOut(){
+function repOut(timedOut){
   REP=null; LAST4=''; MPIN=''; PINS=[]; LEADS=[]; clearSess();
+  if(idleTimer){ clearInterval(idleTimer); idleTimer=null; }
   document.getElementById('repapp').classList.remove('on');
   document.getElementById('repPin').value='';
-  var n=document.querySelector('#rep .nt'); n.style.display='none';
+  var n=document.querySelector('#rep .nt');
+  if(timedOut===true){
+    n.textContent='Signed out after '+IDLE_MIN+' minutes with nothing happening. Enter your code to carry on.';
+    n.style.display='block';
+    document.getElementById('rep').classList.add('on');
+  } else { n.style.display='none'; }
 }
 function mine(p){ return MODE==='rep' && REP && p.claimed_by===REP.name; }
 function dist(a,b,c,d){ var R=3959,t=Math.PI/180,dLat=(c-a)*t,dLon=(d-b)*t;
@@ -1044,9 +1103,15 @@ document.querySelectorAll('.rtab').forEach(function(b){
   });
 });
 ['rq','rtier'].forEach(function(id){ document.getElementById(id).addEventListener('input',function(){ fillSuggest(); render(); }); });
-document.getElementById('rq').addEventListener('focus', fillSuggest);
+/* Do NOT open on focus. It used to fill the phone screen the moment the page
+   loaded and covered everything underneath (BOS: "the searching window is active
+   right away when log in which is block the page"). Suggestions appear only once
+   two characters are typed. */
 document.addEventListener('click', function(e){
   if(!e.target.closest('.searchwrap')) document.getElementById('sugg').classList.remove('on');
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') document.getElementById('sugg').classList.remove('on');
 });
 
 /* BOS: "i want searching window suggestions the restaurant when they type in."
@@ -1056,6 +1121,7 @@ document.addEventListener('click', function(e){
 function fillSuggest(){
   var box=document.getElementById('sugg'); if(!box) return;
   var q=(document.getElementById('rq').value||'').toLowerCase().trim();
+  if(q.length < 2){ box.classList.remove('on'); box.innerHTML=''; return; }
   var live=PINS.filter(function(p){ return !p.client_code; });
   var hits=[];
   if(q){
@@ -1068,8 +1134,6 @@ function fillSuggest(){
       if(an!==bn) return an-bn;
       return (a.name||'').localeCompare(b.name||'');
     });
-  } else {
-    hits=live.slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
   }
   if(!hits.length){ box.classList.remove('on'); box.innerHTML=''; return; }
   box.innerHTML=hits.slice(0,10).map(function(p){
