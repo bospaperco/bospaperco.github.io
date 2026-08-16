@@ -242,6 +242,9 @@ background:var(--ink);color:var(--cream);padding:6px 9px;margin:14px 0 0}
 .ptab{width:100%;border-collapse:collapse;font-size:14px}
 .ptab td{border-bottom:2px solid var(--line,#e6e0d2);padding:7px 9px}
 .ptab td.pr{text-align:right;font-family:"Arial Black",sans-serif;color:var(--teal);white-space:nowrap}
+.ptab td.pr.blocked{color:var(--red);font-size:12px;font-family:inherit;font-weight:700;text-transform:uppercase}
+.ptab tr.blocked td{background:#ffe9e7}
+.guardnote{background:var(--red);color:#fff;padding:8px 10px;font-size:12.5px;font-weight:700;margin-top:2px}
 .ptab td.pqty{text-align:right;color:#8a8377;font-size:12px;white-space:nowrap}
 .pfoot{background:var(--ink);color:var(--cream);padding:11px 18px;font-size:12.5px;font-weight:600}
 .mt{position:fixed;left:0;bottom:0;z-index:80;background:var(--ink);color:var(--mus);padding:5px 10px;font:10px/1 monospace;letter-spacing:.1em}
@@ -1068,13 +1071,28 @@ function openPin(id){
   }
   var off=OFF[p.tier]||0, byCat={};
   ITEMS.forEach(function(i){ (byCat[i.category||'Other']=byCat[i.category||'Other']||[]).push(i); });
-  sheet.innerHTML='<h5>Your price here — Tier '+p.tier+' (master + '+off+')</h5>'+
-    Object.keys(byCat).sort().map(function(c){
+  var blocked=0;
+  var body=Object.keys(byCat).sort().map(function(c){
       return '<h5>'+c+'</h5><table class="ptab">'+byCat[c].map(function(i){
-        return '<tr><td>'+i.item+'</td><td class="pqty">'+(i.per_case?i.per_case+'/case':'')+
-               '</td><td class="pr">$'+(i.master+off).toFixed(2)+'</td></tr>';
+        var price=i.master+off;
+        /* BELOW-COST GUARD (2026-08-16, PW 214). A stale master once put #2 Take Out
+           Box at 39.00 against a 38.90 cost. This FAILS CLOSED on BOS's instruction:
+           if the tier price does not clear our cost, OR we do not know the cost at
+           all, no number is shown and the rep must ask. Showing a price we cannot
+           prove is profitable is the failure this exists to stop. */
+        var noCost = (i.cost==null);
+        var bad = noCost || (price <= Number(i.cost));
+        if(bad) blocked++;
+        return '<tr'+(bad?' class="blocked"':'')+'><td>'+i.item+'</td><td class="pqty">'+
+               (i.per_case?i.per_case+'/case':'')+'</td>'+
+               (bad ? '<td class="pr blocked">'+(noCost?'No cost on file':'Ask BOS')+'</td>'
+                    : '<td class="pr">$'+price.toFixed(2)+'</td>')+'</tr>';
       }).join('')+'</table>';
     }).join('');
+  sheet.innerHTML='<h5>Your price here — Tier '+p.tier+' (master + '+off+')</h5>'+
+    (blocked?'<div class="guardnote">'+blocked+' item'+(blocked===1?'':'s')+
+      ' held back — we cannot prove those clear our cost. Ask BOS before quoting them.</div>':'')+
+    body;
   document.getElementById('pin').classList.add('on');
 }
 function closePin(){ document.getElementById('pin').classList.remove('on'); }
