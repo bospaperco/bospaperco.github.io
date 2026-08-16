@@ -190,7 +190,7 @@ padding:11px 16px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;col
 .rbar .mini{background:var(--teal);color:#fff;border:3px solid var(--ink);padding:8px 12px;
 font:inherit;font-weight:700;font-size:13px;cursor:pointer}
 .rbar .mini:hover{background:var(--ink)}
-#rmap{height:290px;margin:0 16px 14px;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);display:none}
+#rmap{height:340px;margin:0 16px 14px;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);display:none}
 #rmap.on{display:block}
 .plist{padding:0 16px 90px;display:grid;gap:10px}
 .prow{background:var(--paper);border:4px solid var(--ink);box-shadow:5px 5px 0 var(--ink);
@@ -240,7 +240,11 @@ font-weight:900;cursor:pointer;font-size:17px}
 .psheet h5{font-family:"Arial Black",sans-serif;font-size:13px;text-transform:uppercase;
 background:var(--ink);color:var(--cream);padding:6px 9px;margin:14px 0 0}
 .ptab{width:100%;border-collapse:collapse;font-size:14px}
-.ptab td{border-bottom:2px solid var(--line,#e6e0d2);padding:7px 9px}
+.ptab td{border-bottom:2px solid var(--line,#e6e0d2);padding:7px 9px;vertical-align:middle}
+.ptab td.pic{width:54px;padding:5px 4px 5px 9px}
+.ptab td.pic img{width:46px;height:46px;object-fit:contain;display:block;mix-blend-mode:multiply}
+.ptab td.pic .nopic{width:46px;height:46px;border:2px dashed #cfc7b4;display:grid;place-items:center;
+font-size:9px;font-weight:700;color:#a89f8c;text-align:center;line-height:1.1}
 .ptab td.pr{text-align:right;font-family:"Arial Black",sans-serif;color:var(--teal);white-space:nowrap}
 .ptab td.pr.blocked{color:var(--red);font-size:12px;font-family:inherit;font-weight:700;text-transform:uppercase}
 .ptab tr.blocked td{background:#ffe9e7}
@@ -322,7 +326,7 @@ background:var(--ink);color:var(--cream);padding:6px 9px;margin:14px 0 0}
     <button class="rtab" data-t="leads" id="tab_leads" style="display:none">Leads</button>
   </div>
   <div class="rbar">
-    <input id="rq" placeholder="Search name or town…">
+    <input id="rq" list="rqlist" autocomplete="off" placeholder="Search name or town…"><datalist id="rqlist"></datalist>
     <select id="rtier">
       <option value="">All tiers</option>
       <option value="1">Tier 1 · +1</option>
@@ -330,7 +334,7 @@ background:var(--ink);color:var(--cream);padding:6px 9px;margin:14px 0 0}
       <option value="3">Tier 3 · +3</option>
       <option value="4">Tier 4 · +4</option>
     </select>
-    <button class="mini" onclick="toggleMap()">Map</button>
+    <button class="mini" onclick="toggleMap()">Map on/off</button>
     <button class="mini" onclick="useLoc()">Near me</button>
   </div>
   <div id="rmap"></div>
@@ -850,6 +854,22 @@ document.getElementById('f_send').addEventListener('click', function(){
 var API='https://agbxkuaedwallthbpphe.supabase.co/functions/v1/salesmap';
 var REP=null, PINS=[], ITEMS=[], OFF={}, ACTS=[], TAB='work', MYLOC=null, MAP=null, LAYER=null, LAST4='';
 var MODE='rep', LEADS=[], MPIN='';
+/* Product photos are already in this page for the menu door - reuse them for the
+   rep sheet instead of embedding a second copy, so the file does not grow.
+   BOS: "it is hard for rep to read the code and know what item is that." */
+var PHOTO={};
+function nrm(s){ return String(s||'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,''); }
+function buildPhotos(){
+  document.querySelectorAll('.card[data-name]').forEach(function(c){
+    var im=c.querySelector('img'); if(im) PHOTO[nrm(c.dataset.name)]=im.getAttribute('src');
+  });
+}
+function photoFor(name){
+  var k=nrm(name); if(PHOTO[k]) return PHOTO[k];
+  /* colour/finish variants share the base product photo */
+  var base=String(name).replace(/\s+(plain\s+)?(black|white)$/i,'');
+  return PHOTO[nrm(base)]||null;
+}
 var SKEY='bos_sess_v1', SMAXH=12;
 function saveSess(){ try{ localStorage.setItem(SKEY, JSON.stringify(
   {mode:MODE, code: MODE==='manager'?MPIN:LAST4, ts:Date.now()})); }catch(e){} }
@@ -877,6 +897,16 @@ function loadRep(d){
   document.getElementById('tab_leads').style.display = MODE==='manager' ? '' : 'none';
   document.querySelector('[data-t=work]').textContent = MODE==='manager' ? 'Being worked' : 'Working';
   saveSess();
+  buildPhotos();
+  /* BOS: "when log in into rep, map should be the first thing that show up."
+     Open the map immediately, and land on a tab that actually HAS pins - a rep
+     with nothing claimed would otherwise open to an empty map. */
+  var hasWork = PINS.some(mine);
+  TAB = hasWork ? 'work' : 'open';
+  document.querySelectorAll('.rtab').forEach(function(x){ x.classList.toggle('on', x.dataset.t===TAB); });
+  document.getElementById('rmap').classList.add('on');
+  fillSuggest();
+  setTimeout(function(){ initMap(); render(); }, 60);
   document.getElementById('rep').classList.remove('on');
   document.getElementById('repapp').classList.add('on');
   render();
@@ -998,7 +1028,22 @@ document.querySelectorAll('.rtab').forEach(function(b){
     b.classList.add('on'); TAB=b.dataset.t; render();
   });
 });
-['rq','rtier'].forEach(function(id){ document.getElementById(id).addEventListener('input',render); });
+['rq','rtier'].forEach(function(id){ document.getElementById(id).addEventListener('input',function(){ fillSuggest(); render(); }); });
+/* BOS: "the search window not show recommendations." Native datalist so it works
+   the same on the phone. Rebuilt as they type so it narrows with the list. */
+function fillSuggest(){
+  var dl=document.getElementById('rqlist'); if(!dl) return;
+  var q=(document.getElementById('rq').value||'').toLowerCase().trim();
+  var names={}, towns={};
+  PINS.forEach(function(p){
+    if(p.client_code) return;
+    var n=p.name||'', t=(p.city||'')+(p.state?', '+p.state:'');
+    if(n && (!q || n.toLowerCase().indexOf(q)>=0)) names[n]=1;
+    if(t && (!q || t.toLowerCase().indexOf(q)>=0)) towns[t]=1;
+  });
+  var out=Object.keys(names).sort().slice(0,25).concat(Object.keys(towns).sort().slice(0,15));
+  dl.innerHTML=out.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'; }).join('');
+}
 
 function useLoc(){
   if(!navigator.geolocation){ alert('This device will not share a location.'); return; }
@@ -1007,11 +1052,27 @@ function useLoc(){
   }, function(){ alert('Could not get your location.'); }, {timeout:8000});
 }
 function toggleMap(){
+  var f=document.getElementById('mapfail'); if(f) f.remove();
   var m=document.getElementById('rmap'); m.classList.toggle('on');
+  MAPTRIES=0;
   if(m.classList.contains('on')) setTimeout(function(){ initMap(); render(); },60);
 }
+var MAPTRIES=0;
 function initMap(){
-  if(MAP||typeof L==='undefined') return;
+  if(MAP) return;
+  if(typeof L==='undefined'){
+    /* Leaflet comes from a CDN. If it cannot load - bad signal in a van, blocked
+       network - do NOT leave an empty bordered box spinning forever. Give up
+       after ~8s, hide the map and say so. The list below still works. */
+    if(++MAPTRIES > 32){
+      var m=document.getElementById('rmap');
+      m.classList.remove('on');
+      m.insertAdjacentHTML('afterend',
+        '<div class="empty" id="mapfail">Map could not load (no connection to the map service). The list below still works.</div>');
+      return;
+    }
+    setTimeout(initMap, 250); return;
+  }
   MAP=L.map('rmap').setView([42.57,-70.95],9);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(MAP);
@@ -1083,7 +1144,10 @@ function openPin(id){
         var noCost = (i.cost==null);
         var bad = noCost || (price <= Number(i.cost));
         if(bad) blocked++;
-        return '<tr'+(bad?' class="blocked"':'')+'><td>'+i.item+'</td><td class="pqty">'+
+        var ph=photoFor(i.item);
+        return '<tr'+(bad?' class="blocked"':'')+'><td class="pic">'+
+               (ph?'<img loading="lazy" src="'+ph+'" alt="">':'<span class="nopic">NO<br>PIC</span>')+
+               '</td><td>'+i.item+'</td><td class="pqty">'+
                (i.per_case?i.per_case+'/case':'')+'</td>'+
                (bad ? '<td class="pr blocked">'+(noCost?'No cost on file':'Ask BOS')+'</td>'
                     : '<td class="pr">$'+price.toFixed(2)+'</td>')+'</tr>';
