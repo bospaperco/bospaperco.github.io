@@ -190,7 +190,19 @@ padding:11px 16px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;col
 .rbar .mini{background:var(--teal);color:#fff;border:3px solid var(--ink);padding:8px 12px;
 font:inherit;font-weight:700;font-size:13px;cursor:pointer}
 .rbar .mini:hover{background:var(--ink)}
-#rmap{height:340px;margin:0 16px 14px;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);display:none}
+#rmap{height:44vh;min-height:260px;margin:0;border:0;border-bottom:5px solid var(--ink);display:none}
+#rmap.on{display:block}
+.searchwrap{position:relative;flex:1;min-width:170px}
+.searchwrap input{width:100%}
+.sugg{display:none;position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--paper);
+border:3px solid var(--ink);border-top:0;max-height:300px;overflow:auto;box-shadow:6px 6px 0 rgba(28,26,23,.25)}
+.sugg.on{display:block}
+.sugg button{display:block;width:100%;text-align:left;border:0;border-bottom:2px solid #e6e0d2;
+background:none;padding:9px 11px;font:inherit;cursor:pointer}
+.sugg button:hover{background:var(--mus)}
+.sugg .nm{font-weight:700;font-size:14px;display:block}
+.sugg .tw{font-size:12px;color:#5c564d}
+.sugg .tr{float:right;font-size:11px;font-weight:700;border:2px solid var(--ink);padding:0 5px}
 #rmap.on{display:block}
 .plist{padding:0 16px 90px;display:grid;gap:10px}
 .prow{background:var(--paper);border:4px solid var(--ink);box-shadow:5px 5px 0 var(--ink);
@@ -313,20 +325,12 @@ font-size:9px;font-weight:700;color:#a89f8c;text-align:center;line-height:1.1}
     <div class="rwho"><span class="av" id="rav">?</span><span id="rname">—</span></div>
     <button class="hb" onclick="repOut()">Sign out</button>
   </div>
-  <div class="rstats">
-    <div class="rstat y"><b id="st_work">0</b><span>Working</span></div>
-    <div class="rstat g"><b id="st_open">0</b><span>Open pins</span></div>
-    <div class="rstat"><b id="st_won">0</b><span>Closed</span></div>
-  </div>
-  <div class="rtabs">
-    <button class="rtab on" data-t="work">Working</button>
-    <button class="rtab" data-t="open">Open pins</button>
-    <button class="rtab" data-t="won">Closed</button>
-    <button class="rtab" data-t="act">Activity</button>
-    <button class="rtab" data-t="leads" id="tab_leads" style="display:none">Leads</button>
-  </div>
+  <div id="rmap"></div>
   <div class="rbar">
-    <input id="rq" list="rqlist" autocomplete="off" placeholder="Search name or town…"><datalist id="rqlist"></datalist>
+    <div class="searchwrap">
+      <input id="rq" autocomplete="off" placeholder="Search a restaurant or town…">
+      <div class="sugg" id="sugg"></div>
+    </div>
     <select id="rtier">
       <option value="">All tiers</option>
       <option value="1">Tier 1 · +1</option>
@@ -337,7 +341,18 @@ font-size:9px;font-weight:700;color:#a89f8c;text-align:center;line-height:1.1}
     <button class="mini" onclick="toggleMap()">Map on/off</button>
     <button class="mini" onclick="useLoc()">Near me</button>
   </div>
-  <div id="rmap"></div>
+  <div class="rstats">
+    <div class="rstat y"><b id="st_work">0</b><span>Working</span></div>
+    <div class="rstat g"><b id="st_open">0</b><span>Open pins</span></div>
+    <div class="rstat"><b id="st_won">0</b><span>Closed</span></div>
+  </div>
+  <div class="rtabs">
+    <button class="rtab" data-t="work">Working</button>
+    <button class="rtab on" data-t="open">Open pins</button>
+    <button class="rtab" data-t="won">Closed</button>
+    <button class="rtab" data-t="act">Activity</button>
+    <button class="rtab" data-t="leads" id="tab_leads" style="display:none">Leads</button>
+  </div>
   <div class="plist" id="rlist"></div>
 </div>
 
@@ -902,7 +917,7 @@ function loadRep(d){
      Open the map immediately, and land on a tab that actually HAS pins - a rep
      with nothing claimed would otherwise open to an empty map. */
   var hasWork = PINS.some(mine);
-  TAB = hasWork ? 'work' : 'open';
+  TAB = hasWork ? 'work' : 'open';   /* never open onto an empty board */
   document.querySelectorAll('.rtab').forEach(function(x){ x.classList.toggle('on', x.dataset.t===TAB); });
   document.getElementById('rmap').classList.add('on');
   fillSuggest();
@@ -1029,21 +1044,47 @@ document.querySelectorAll('.rtab').forEach(function(b){
   });
 });
 ['rq','rtier'].forEach(function(id){ document.getElementById(id).addEventListener('input',function(){ fillSuggest(); render(); }); });
-/* BOS: "the search window not show recommendations." Native datalist so it works
-   the same on the phone. Rebuilt as they type so it narrows with the list. */
+document.getElementById('rq').addEventListener('focus', fillSuggest);
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.searchwrap')) document.getElementById('sugg').classList.remove('on');
+});
+
+/* BOS: "i want searching window suggestions the restaurant when they type in."
+   A real dropdown rather than a datalist - a datalist is invisible until the
+   browser feels like showing it, and on a phone it often does not appear at all.
+   Tapping a suggestion opens that restaurant straight away. */
 function fillSuggest(){
-  var dl=document.getElementById('rqlist'); if(!dl) return;
+  var box=document.getElementById('sugg'); if(!box) return;
   var q=(document.getElementById('rq').value||'').toLowerCase().trim();
-  var names={}, towns={};
-  PINS.forEach(function(p){
-    if(p.client_code) return;
-    var n=p.name||'', t=(p.city||'')+(p.state?', '+p.state:'');
-    if(n && (!q || n.toLowerCase().indexOf(q)>=0)) names[n]=1;
-    if(t && (!q || t.toLowerCase().indexOf(q)>=0)) towns[t]=1;
-  });
-  var out=Object.keys(names).sort().slice(0,25).concat(Object.keys(towns).sort().slice(0,15));
-  dl.innerHTML=out.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'; }).join('');
+  var live=PINS.filter(function(p){ return !p.client_code; });
+  var hits=[];
+  if(q){
+    hits=live.filter(function(p){
+      return ((p.name||'').toLowerCase().indexOf(q)>=0) || ((p.city||'').toLowerCase().indexOf(q)>=0);
+    });
+    // name matches first, then town matches
+    hits.sort(function(a,b){
+      var an=(a.name||'').toLowerCase().indexOf(q)>=0?0:1, bn=(b.name||'').toLowerCase().indexOf(q)>=0?0:1;
+      if(an!==bn) return an-bn;
+      return (a.name||'').localeCompare(b.name||'');
+    });
+  } else {
+    hits=live.slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  }
+  if(!hits.length){ box.classList.remove('on'); box.innerHTML=''; return; }
+  box.innerHTML=hits.slice(0,10).map(function(p){
+    return '<button type="button" data-pin="'+p.id+'">'+
+      (p.tier?'<span class="tr">T'+p.tier+'</span>':'')+
+      '<span class="nm">'+(p.name||'')+'</span>'+
+      '<span class="tw">'+[p.street,p.city,p.state].filter(Boolean).join(', ')+'</span></button>';
+  }).join('');
+  box.classList.add('on');
 }
+document.getElementById('sugg').addEventListener('click', function(e){
+  var b=e.target.closest('[data-pin]'); if(!b) return;
+  document.getElementById('sugg').classList.remove('on');
+  openPin(Number(b.dataset.pin));
+});
 
 function useLoc(){
   if(!navigator.geolocation){ alert('This device will not share a location.'); return; }
